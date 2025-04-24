@@ -21,8 +21,11 @@ export default async function RootLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  // Make sure params exists and has a locale property
-  const locale = params?.locale || i18n.defaultLocale
+  // Ensure params.locale is valid, defaulting to the default locale if not
+  const locale = (params && params.locale && i18n.locales.includes(params.locale))
+    ? params.locale
+    : i18n.defaultLocale
+    
   const dict = await getDictionary(locale)
 
   return (
