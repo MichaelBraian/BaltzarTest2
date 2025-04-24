@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 // Optimize font loading
@@ -36,8 +37,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="sv" className={inter.variable}>
-      <body className={inter.className}>{children}</body>
+    <html lang="sv" className={inter.variable} suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-background antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          storageKey="baltzar-theme"
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
