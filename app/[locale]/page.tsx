@@ -18,10 +18,10 @@ export default async function HomePage({
 }: {
   params: { locale: string }
 }) {
-  // Ensure locale is valid
-  const validLocale = await Promise.resolve(params?.locale && i18n.locales.includes(params.locale)
-    ? params.locale
-    : i18n.defaultLocale)
+  // Get the locale from params and validate it
+  const locale = params.locale
+  const isValidLocale = i18n.locales.includes(locale)
+  const validLocale = isValidLocale ? locale : i18n.defaultLocale
 
   // Get dictionary data
   const dict = await getDictionary(validLocale)
@@ -73,7 +73,7 @@ export default async function HomePage({
         {/* 3. Technology Section */}
         <section id="technology" className="section py-20">
           <AnimatedSection animation="slideUp">
-            <TechnologySection dictionary={dict.home.technology} />
+            <TechnologySection dictionary={dict.home.technology} locale={validLocale} />
           </AnimatedSection>
         </section>
 

@@ -21,11 +21,12 @@ export default async function LocaleLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  // Ensure params.locale is valid, defaulting to the default locale if not
-  const validLocale = await Promise.resolve(params?.locale && i18n.locales.includes(params.locale)
-    ? params.locale
-    : i18n.defaultLocale)
-    
+  // Get the locale from params and validate it
+  const locale = params.locale
+  const isValidLocale = i18n.locales.includes(locale)
+  const validLocale = isValidLocale ? locale : i18n.defaultLocale
+  
+  // Get dictionary data
   const dict = await getDictionary(validLocale)
 
   return (
