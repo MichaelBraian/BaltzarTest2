@@ -14,7 +14,7 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }))
 }
 
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
@@ -22,22 +22,22 @@ export default async function RootLayout({
   params: { locale: string }
 }) {
   // Ensure params.locale is valid, defaulting to the default locale if not
-  const locale = (params && params.locale && i18n.locales.includes(params.locale))
+  const validLocale = await Promise.resolve(params?.locale && i18n.locales.includes(params.locale)
     ? params.locale
-    : i18n.defaultLocale
+    : i18n.defaultLocale)
     
-  const dict = await getDictionary(locale)
+  const dict = await getDictionary(validLocale)
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={validLocale} suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <div className="min-h-screen flex flex-col mx-auto max-w-screen-2xl w-full">
-            <Navigation locale={locale} />
+            <Navigation locale={validLocale} />
             <PageTransition>
               <main className="flex-1">{children}</main>
             </PageTransition>
-            <Footer locale={locale} dictionary={dict.footer} />
+            <Footer locale={validLocale} dictionary={dict.footer} />
           </div>
         </ThemeProvider>
       </body>

@@ -11,41 +11,47 @@ import { ContactForm } from "@/components/contact-form"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { getStaffData } from "@/lib/data/staff"
 import { getValues } from "@/lib/data/values"
+import { i18n } from "@/lib/i18n-config"
 
-export default async function Home({
-  params: { locale },
+export default async function HomePage({
+  params,
 }: {
   params: { locale: string }
 }) {
+  // Ensure locale is valid
+  const validLocale = await Promise.resolve(params?.locale && i18n.locales.includes(params.locale)
+    ? params.locale
+    : i18n.defaultLocale)
+
   // Get dictionary data
-  const dict = await getDictionary(locale)
+  const dict = await getDictionary(validLocale)
 
   // Get staff data and values from separate files
-  const { doctors, staff } = getStaffData(locale)
-  const values = getValues(locale)
+  const { doctors, staff } = getStaffData(validLocale)
+  const values = getValues(validLocale)
 
   // Section titles for staff section
   const staffTitles = {
-    doctors: locale === "sv" ? "Våra Tandläkare" : "Our Dentists",
+    doctors: validLocale === "sv" ? "Våra Tandläkare" : "Our Dentists",
     doctorsSubtitle:
-      locale === "sv"
+      validLocale === "sv"
         ? "Våra tandläkare är specialister inom sina respektive områden och använder den senaste digitala teknologin för att ge dig bästa möjliga vård."
         : "Our dentists are specialists in their respective fields and use the latest digital technology to provide you with the best possible care.",
-    staff: locale === "sv" ? "Vår Personal" : "Our Staff",
+    staff: validLocale === "sv" ? "Vår Personal" : "Our Staff",
     staffSubtitle:
-      locale === "sv"
+      validLocale === "sv"
         ? "Vår dedikerade personal säkerställer att din upplevelse hos Baltzar Tandvård är så bekväm och smidig som möjligt."
         : "Our dedicated staff ensures that your experience at Baltzar Tandvård is as comfortable and smooth as possible.",
-    values: locale === "sv" ? "Våra Värderingar" : "Our Values",
+    values: validLocale === "sv" ? "Våra Värderingar" : "Our Values",
     valuesSubtitle:
-      locale === "sv"
+      validLocale === "sv"
         ? "På Baltzar Tandvård styrs vi av ett antal kärnvärderingar som formar hur vi arbetar och interagerar med våra patienter."
         : "At Baltzar Tandvård, we are guided by a set of core values that shape how we work and interact with our patients.",
   }
 
   return (
     <div className="flex flex-col">
-      <Navigation locale={locale} />
+      <Navigation locale={validLocale} />
       <AnimatedBackground />
 
       {/* 1. Hero Section */}
@@ -59,7 +65,7 @@ export default async function Home({
         <section id="treatments" className="section py-20">
           <AnimatedSection animation="fadeIn">
             <div className="container mx-auto">
-              <ServicesOverview dictionary={{ ...dict.home.services, locale }} />
+              <ServicesOverview dictionary={{ ...dict.home.services, locale: validLocale }} />
             </div>
           </AnimatedSection>
         </section>
@@ -76,7 +82,7 @@ export default async function Home({
           <AnimatedSection animation="fadeIn">
             <div className="container mx-auto">
               <PatientReviews
-                locale={locale}
+                locale={validLocale}
                 title={dict.home.testimonials.title}
                 subtitle={dict.home.testimonials.subtitle}
               />
@@ -87,14 +93,20 @@ export default async function Home({
         {/* 5. Staff Section */}
         <section id="staff" className="section py-20">
           <div className="container mx-auto">
-            <HomeStaffSection doctors={doctors} staff={staff} values={values} locale={locale} titles={staffTitles} />
+            <HomeStaffSection 
+              doctors={doctors} 
+              staff={staff} 
+              values={values} 
+              locale={validLocale} 
+              titles={staffTitles} 
+            />
           </div>
         </section>
 
         {/* 6. Contact Section */}
         <section id="contact" className="section py-20 bg-gray-900">
           <div className="container mx-auto">
-            <ContactForm dictionary={dict.contact} locale={locale} />
+            <ContactForm dictionary={dict.contact} locale={validLocale} />
           </div>
         </section>
       </main>
