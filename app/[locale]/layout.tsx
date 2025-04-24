@@ -30,9 +30,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-foreground`}>
+      <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <div className="flex min-h-screen flex-col mx-auto max-w-screen-2xl w-full">
+          <div className="min-h-screen flex flex-col mx-auto max-w-screen-2xl w-full">
             <Navigation locale={locale} />
             <PageTransition>
               <main className="flex-1">{children}</main>

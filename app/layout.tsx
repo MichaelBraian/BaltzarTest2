@@ -37,15 +37,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="sv" className={inter.variable} suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-background antialiased`}>
+    <html lang="sv" suppressHydrationWarning>
+      <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
           storageKey="baltzar-theme"
         >
-          {children}
+          <div className="min-h-screen">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
