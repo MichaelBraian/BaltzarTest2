@@ -1,0 +1,240 @@
+{
+  "navigation": {
+    "home": "Home",
+    "services": "Services",
+    "staff": "Staff",
+    "about": "About Us",
+    "contact": "Contact",
+    "book": "Book Appointment"
+  },
+  "home": {
+    "hero": {
+      "title": "Advanced Specialist Dental Care",
+      "subtitle": "Welcome to the future of dental care – where technical innovation meets thoughtful treatment for the best results.",
+      "bookButton": "Book Consultation",
+      "learnMoreButton": "Learn More About Us"
+    },
+    "services": {
+      "title": "Our Treatments",
+      "subtitle": "At Baltzar Tandvård, we offer everything from general dentistry to specialized treatments with digital precision.",
+      "services": [
+        {
+          "title": "Digital Implant Treatment",
+          "description": "Planned and performed with 3D technology for optimal results and minimal intervention."
+        },
+        {
+          "title": "Aesthetic Dentistry",
+          "description": "Enhance your smile with veneers, crowns, and whitening designed for natural results."
+        },
+        {
+          "title": "General Dentistry",
+          "description": "Regular care with focus on prevention and long-term dental health."
+        },
+        {
+          "title": "Pediatric Dentistry",
+          "description": "Safe and positive dental experience for our youngest patients."
+        }
+      ]
+    },
+    "technology": {
+      "title": "Digital Dental Technology",
+      "subtitle": "At Baltzar Tandvård, we invest in the latest digital technology to provide you with safer, more comfortable, and more precise treatments.",
+      "items": [
+        {
+          "title": "Digital X-ray",
+          "description": "Panoramic image with low radiation dose – for precise and safe diagnostics.",
+          "expandedDescription": "Digital panoramic X-ray – safe and efficient diagnostics\nAt Baltzar Tandvård, we use digital panoramic X-ray to create a complete overview of the entire jaw in a single image. This technology is an important tool in our diagnostics and treatment planning.\n\nWith panoramic X-ray, we can:\n\nAssess tooth placement, bone structure, and root status\n\nDetect infections, cysts, or other changes in the jawbone\n\nPrepare for treatments such as implants, extractions, or prosthetics\n\nOur equipment has a low radiation dose and high-resolution image quality, making the examination both safe and efficient.\n\nDigital image management allows us to quickly analyze, share, and archive your X-ray images – and also collaborate with referrers when needed.\n\nWith us, diagnostics is the first step towards safe and accurate treatment."
+        },
+        {
+          "title": "Intraoral 3D Scanning",
+          "description": "Digital impression taking without discomfort for perfect fit.",
+          "expandedDescription": "Our advanced intraoral 3D scanners replace conventional impressions with a fast and comfortable digital process.\n\nBy using a small handheld camera, we can create an exact digital model of your teeth and gums in just a few minutes, completely without the discomfort that traditional impression materials can cause.\n\nAdvantages of digital impression taking:\n• Comfortable and quick process without gagging sensation\n• Extreme precision for better fit on crowns and prosthetics\n• Immediate visualization of digital models\n• Easy storage and access to digital impressions\n• Environmentally friendly method that eliminates material waste\n\nThe digital models can be used for everything from planning Invisalign treatments to designing crowns, bridges, and other prosthetic work."
+        },
+        {
+          "title": "CAD/CAM Technology",
+          "description": "Computer-aided design and manufacturing for precision components.",
+          "expandedDescription": "CAD/CAM (Computer-Aided Design/Computer-Aided Manufacturing) is fundamental to our digital dental process and enables the design and manufacturing of dental prosthetics with unsurpassed precision.\n\nAfter 3D scanning of the mouth, we use advanced CAD software to:\n• Design crowns, bridges, and implant components with micrometer precision\n• Virtually simulate function and aesthetics before manufacturing\n• Optimize materials and geometry for maximum durability\n• Communicate digitally with the patient about design options\n\nWhen the design is finished, it is sent to our CAM systems (milling machines and 3D printers) that manufacture the final product with exactly the same specifications as in the digital design.\n\nThis gives us the ability to manufacture dental prosthetics with a fit, function, and aesthetics that are superior to traditionally handcrafted alternatives."
+        },
+        {
+          "title": "AI-assisted Analysis",
+          "description": "Artificial intelligence for improved diagnostics and treatment planning.",
+          "expandedDescription": "We use advanced AI systems that complement our dentists' expertise and improve diagnostic precision and treatment outcomes.\n\nOur AI algorithms are trained on millions of dental data and help to:\n• Identify cavities, cracks, and periapical lesions that can be difficult to detect\n• Analyze bite development and suggest optimal orthodontic treatment\n• Predict long-term outcomes of different treatment options\n• Detect early signs of gum problems and other risk factors\n• Optimize the design of dental prosthetics based on biomechanical principles\n\nThe AI technology serves as a decision support for our clinicians, and each AI suggestion is carefully reviewed by our specialists. This provides a combination of technological precision and human expertise for the best possible care."
+        },
+        {
+          "title": "Augmented Reality",
+          "description": "Preview your future smile in 3D – before the treatment even begins.",
+          "expandedDescription": "Augmented Reality – Visualize your smile before treatment\nAt Baltzar Dental, we use Augmented Reality (AR) technology to give you a realistic preview of your new smile before any treatment starts.\n\nBy combining:\n\nHigh-resolution photography\n\nIntraoral 3D scans\n\nDigital smile design tools\n\n…we create a true-to-life simulation of your future result. This allows you to see and evaluate your potential outcome, increasing confidence, clarity, and shared decision-making.\n\nFor us, dentistry isn't just about precision – it's about creating smiles that feel right and look right."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "What Our Patients Say",
+      "subtitle": "Read about experiences from our satisfied patients",
+      "items": [
+        {
+          "content": "The team at Baltzar Tandvård provided exceptional service. The procedure was painless and the results are amazing!",
+          "name": "Emma Johnson",
+          "role": "Patient since 2019"
+        },
+        {
+          "content": "I've been afraid of dentists my whole life, but the staff here made me feel comfortable and at ease.",
+          "name": "Michael Smith",
+          "role": "Patient since 2020"
+        },
+        {
+          "content": "The most professional dental clinic I've ever visited. State-of-the-art equipment and friendly staff.",
+          "name": "Sarah Williams",
+          "role": "Patient since 2018"
+        }
+      ]
+    },
+    "blog": {
+      "title": "Dental Health Blog",
+      "subtitle": "Tips and insights for maintaining optimal oral health",
+      "viewAllButton": "View All Posts",
+      "readMoreButton": "Read More",
+      "posts": [
+        {
+          "title": "5 Tips for Maintaining Healthy Teeth",
+          "date": "June 15, 2023",
+          "excerpt": "Learn the essential daily habits that can help you maintain healthy teeth and prevent common dental problems.",
+          "slug": "tips-for-healthy-teeth"
+        },
+        {
+          "title": "Understanding Dental Implants",
+          "date": "May 22, 2023",
+          "excerpt": "Everything you need to know about dental implants, from the procedure to recovery and maintenance.",
+          "slug": "understanding-dental-implants"
+        },
+        {
+          "title": "The Connection Between Oral Health and Overall Wellness",
+          "date": "April 10, 2023",
+          "excerpt": "Discover how your oral health can impact your overall physical wellbeing and why regular dental check-ups are crucial.",
+          "slug": "oral-health-and-wellness"
+        }
+      ]
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are accepting new patients and are happy to help with questions about our treatments. Contact us via the form or use our contact details below.",
+    "address": "Baltzargatan 25, 211 36 Malmö",
+    "phone": "+4640123456",
+    "email": "info@baltzartandvard.se",
+    "hours": "Monday-Friday: 08:00-17:00\nSaturday-Sunday: Closed",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "submit": "Send Message"
+    }
+  },
+  "footer": {
+    "company": {
+      "title": "Company",
+      "links": [
+        { "name": "About Us", "href": "/about" },
+        { "name": "Our Team", "href": "/staff" },
+        { "name": "Careers", "href": "/careers" },
+        { "name": "News", "href": "/news" }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "links": [
+        { "name": "Digital Implant Treatment", "href": "/services/implants" },
+        { "name": "Aesthetic Dentistry", "href": "/services/cosmetic" },
+        { "name": "General Dentistry", "href": "/services/general" },
+        { "name": "Pediatric Dentistry", "href": "/services/children" }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "address": "Baltzargatan 25, 211 36 Malmö",
+      "phone": "+4640123456",
+      "email": "info@baltzartandvard.se"
+    },
+    "social": {
+      "title": "Follow Us"
+    },
+    "copyright": "All rights reserved."
+  },
+  "services": {
+    "title": "Our Treatments",
+    "subtitle": "At Baltzar Tandvård, we offer everything from general dentistry to specialized treatments with digital precision.",
+    "items": [
+      {
+        "title": "Digital Implant Treatment",
+        "description": "Planned and performed with 3D technology for optimal results and minimal intervention.",
+        "expandedDescription": "Our digital implant treatments represent the absolute latest in modern dentistry. By combining 3D X-ray, digital scanning, and computer-assisted surgery, we can:\n• Plan exact placement of dental implants virtually before treatment begins\n• Manufacture precision guides for surgical placement\n• Minimize surgical interventions and reduce recovery time\n• Achieve better aesthetic and functional results\n• Create a predictable and safe treatment process\n\nThis technology allows us to perform implant treatments with higher precision, less discomfort, and better end results than with traditional methods."
+      },
+      {
+        "title": "Aesthetic Dentistry",
+        "description": "Enhance your smile with veneers, crowns, and whitening designed for natural results.",
+        "expandedDescription": "Our aesthetic dentistry combines science and art to create beautiful smiles that look natural and last long.\n\nWe offer a range of aesthetic treatments, including:\n• Porcelain veneers - thin shells attached to the front of teeth to correct discoloration, unevenness, or gaps\n• Ceramic crowns - complete \"caps\" that restore damaged teeth with both function and appearance\n• Teeth whitening - professional systems for effective and gentle brightening of teeth\n• Aesthetic composite fillings - tooth-colored fillings that are both functional and aesthetic\n• Dental jewelry and other aesthetic details\n\nWith digital photography and virtual planning, you can see your new smile before treatment even begins."
+      },
+      {
+        "title": "General Dentistry",
+        "description": "Regular care with focus on prevention and long-term dental health.",
+        "expandedDescription": "We offer all types of general dental care with a focus on preventive treatment and long-term oral health.\n\nOur general dental services include:\n• Comprehensive examinations with digital X-rays for early diagnostics\n• Professional teeth cleaning and oral hygiene advice\n• Aesthetic tooth fillings with modern materials\n• Root canal treatments with advanced technology for better results\n• Treatment of gum problems and prevention of periodontal disease\n• Support and advice for home routines that promote good oral health\n\nWe place great emphasis on early diagnosis and preventive treatment to avoid more extensive and costly treatments in the future."
+      },
+      {
+        "title": "Pediatric Dentistry",
+        "description": "Safe and positive dental experience for our youngest patients.",
+        "expandedDescription": "At Baltzar Tandvård, we have specialized in making dental visits a positive experience even for our youngest patients.\n\nOur pediatric dental care includes:\n• Age-appropriate examinations and treatments\n• Preventive dental care with fluoride treatments and fissure sealants\n• Playful introduction to tooth brushing and oral hygiene\n• Gentle treatments with extra focus on being pain-free\n• Digital X-rays with minimal radiation\n• Advice to parents about diet, habits, and dental care routines\n\nWe build trusting relationships with children from an early age to promote a lifelong positive attitude towards dental care and prevent dental anxiety."
+      },
+      {
+        "title": "Invisalign Orthodontics",
+        "description": "Invisible teeth straightening for both adults and teenagers.",
+        "expandedDescription": "Invisalign is a modern alternative to traditional braces, where clear, removable aligners are used to gradually move teeth into the correct position.\n\nThe benefits of Invisalign include:\n• Nearly invisible aligners that few others notice\n• Removable aligners that allow you to eat, brush, and floss as usual\n• Digital planning where you can see the end result before treatment begins\n• Fewer visits to the clinic compared to conventional orthodontics\n• Often shorter treatment time than with traditional orthodontics\n• Increased comfort without metal brackets and wires\n\nAs certified Invisalign providers, we offer this option for both adults and teenagers who want to straighten crooked teeth discreetly and comfortably."
+      },
+      {
+        "title": "Digital Prosthetics",
+        "description": "Custom-made prosthetics designed and manufactured with digital precision.",
+        "expandedDescription": "Our digital prosthetics represent the next generation of dental replacements with superior results in both function and aesthetics.\n\nWe offer digitally designed and manufactured:\n• Crowns and bridges with perfect fit and function\n• Implant-supported structures for single teeth or full dentition\n• Partial and complete dentures with optimal comfort\n• Night guards and snore guards\n• Temporary prosthetics made on-site with 3D printers\n\nBy using digital scanning instead of conventional impressions, we get exact digital models of your teeth, resulting in prosthetics with better fit, appearance, and function.\n\nOur own digital laboratory enables faster delivery and higher precision than with traditional prosthetic solutions."
+      }
+    ]
+  },
+  "technology": {
+    "title": "Digital Dental Technology",
+    "subtitle": "At Baltzar Tandvård, we invest in the latest digital technology to provide you with safer, more comfortable, and more precise treatments.",
+    "items": [
+      {
+        "title": "Digital X-ray",
+        "description": "Panoramic image with low radiation dose – for precise and safe diagnostics.",
+        "expandedDescription": "Digital panoramic X-ray – safe and efficient diagnostics\nAt Baltzar Tandvård, we use digital panoramic X-ray to create a complete overview of the entire jaw in a single image. This technology is an important tool in our diagnostics and treatment planning.\n\nWith panoramic X-ray, we can:\n\nAssess tooth placement, bone structure, and root status\n\nDetect infections, cysts, or other changes in the jawbone\n\nPrepare for treatments such as implants, extractions, or prosthetics\n\nOur equipment has a low radiation dose and high-resolution image quality, making the examination both safe and efficient.\n\nDigital image management allows us to quickly analyze, share, and archive your X-ray images – and also collaborate with referrers when needed.\n\nWith us, diagnostics is the first step towards safe and accurate treatment."
+      },
+      {
+        "title": "Intraoral 3D Scanning",
+        "description": "Digital impression taking without discomfort for perfect fit.",
+        "expandedDescription": "Our advanced intraoral 3D scanners replace conventional impressions with a fast and comfortable digital process.\n\nBy using a small handheld camera, we can create an exact digital model of your teeth and gums in just a few minutes, completely without the discomfort that traditional impression materials can cause.\n\nAdvantages of digital impression taking:\n• Comfortable and quick process without gagging sensation\n• Extreme precision for better fit on crowns and prosthetics\n• Immediate visualization of digital models\n• Easy storage and access to digital impressions\n• Environmentally friendly method that eliminates material waste\n\nThe digital models can be used for everything from planning Invisalign treatments to designing crowns, bridges, and other prosthetic work."
+      },
+      {
+        "title": "CAD/CAM Technology",
+        "description": "Computer-aided design and manufacturing for precision components.",
+        "expandedDescription": "CAD/CAM (Computer-Aided Design/Computer-Aided Manufacturing) is fundamental to our digital dental process and enables the design and manufacturing of dental prosthetics with unsurpassed precision.\n\nAfter 3D scanning of the mouth, we use advanced CAD software to:\n• Design crowns, bridges, and implant components with micrometer precision\n• Virtually simulate function and aesthetics before manufacturing\n• Optimize materials and geometry for maximum durability\n• Communicate digitally with the patient about design options\n\nWhen the design is finished, it is sent to our CAM systems (milling machines and 3D printers) that manufacture the final product with exactly the same specifications as in the digital design.\n\nThis gives us the ability to manufacture dental prosthetics with a fit, function, and aesthetics that are superior to traditionally handcrafted alternatives."
+      },
+      {
+        "title": "AI-assisted Analysis",
+        "description": "Artificial intelligence for improved diagnostics and treatment planning.",
+        "expandedDescription": "We use advanced AI systems that complement our dentists' expertise and improve diagnostic precision and treatment outcomes.\n\nOur AI algorithms are trained on millions of dental data and help to:\n• Identify cavities, cracks, and periapical lesions that can be difficult to detect\n• Analyze bite development and suggest optimal orthodontic treatment\n• Predict long-term outcomes of different treatment options\n• Detect early signs of gum problems and other risk factors\n• Optimize the design of dental prosthetics based on biomechanical principles\n\nThe AI technology serves as a decision support for our clinicians, and each AI suggestion is carefully reviewed by our specialists. This provides a combination of technological precision and human expertise for the best possible care."
+      },
+      {
+        "title": "Digital Treatment Planning",
+        "description": "Interactive planning and visualization of treatment results.",
+        "expandedDescription": "Our digital treatment planning makes it possible to simulate, visualize, and optimize your treatment before it begins.\n\nWith advanced software, we can:\n• Create a digital twin of your oral cavity for virtual treatment simulation\n• Visualize the end result of aesthetic treatments\n• Simulate tooth movement during orthodontic treatment\n• Optimize implant positions for best function and aesthetics\n• Plan complex reconstructions step by step\n\nThis technology not only provides better treatment results but also makes you an active participant in the planning. You can see different treatment options, better understand the process, and have realistic expectations for the end result.\n\nDigital treatment planning also reduces the risk of unexpected complications during treatment, as many potential problems can be identified and solved in the virtual planning phase."
+      },
+      {
+        "title": "3D Printed Guides & Models",
+        "description": "Custom surgical guides and working models for precision.",
+        "expandedDescription": "We use advanced 3D printing technology to manufacture precision components that are crucial for modern dental treatments.\n\nBased on digital 3D scans and treatment planning, we can print:\n• Surgical guides for exact implant placement\n• Working models for prosthetic manufacturing\n• Temporary prosthetics and treatment guards\n• Orthodontic aligners for teeth straightening\n• Demonstration models for patient education\n\nOur 3D printers use biocompatible materials with medical certification and can produce components with micrometer precision.\n\n3D printed surgical guides are particularly valuable in implant treatments, as they ensure that implants are placed exactly according to the digital plan, minimizing risks and optimizing treatment outcomes."
+      },
+      {
+        "title": "Augmented Reality",
+        "description": "Preview your future smile in 3D – before the treatment even begins.",
+        "expandedDescription": "Augmented Reality – Visualize your smile before treatment\nAt Baltzar Dental, we use Augmented Reality (AR) technology to give you a realistic preview of your new smile before any treatment starts.\n\nBy combining:\n\nHigh-resolution photography\n\nIntraoral 3D scans\n\nDigital smile design tools\n\n…we create a true-to-life simulation of your future result. This allows you to see and evaluate your potential outcome, increasing confidence, clarity, and shared decision-making.\n\nFor us, dentistry isn't just about precision – it's about creating smiles that feel right and look right."
+      }
+    ]
+  }
+}

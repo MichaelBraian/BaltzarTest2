@@ -1,0 +1,255 @@
+{
+  "navigation": {
+    "home": "Hem",
+    "services": "Tjänster",
+    "staff": "Personal",
+    "about": "Om Oss",
+    "contact": "Kontakt",
+    "book": "Boka Tid"
+  },
+  "home": {
+    "hero": {
+      "title": "Avancerad Specialisttandvård",
+      "subtitle": "Välkommen till framtidens tandvård – där teknisk innovation möter omtänksam behandling för bästa resultat.",
+      "bookButton": "Boka konsultation",
+      "learnMoreButton": "Läs mer om oss"
+    },
+    "services": {
+      "title": "Våra Behandlingar",
+      "subtitle": "På Baltzar Tandvård erbjuder vi allt från allmän tandvård till specialiserade behandlingar med digital precision.",
+      "services": [
+        {
+          "title": "Digital Implantatbehandling",
+          "description": "Planerad och utförd med 3D-teknik för bästa resultat och minimala ingrepp."
+        },
+        {
+          "title": "Estetisk Tandvård",
+          "description": "Förbättra ditt leende med fasader, kronor och blekning designade för ett naturligt resultat."
+        },
+        {
+          "title": "Allmän Tandvård",
+          "description": "Regelbunden vård med fokus på prevention och långsiktig tandhälsa."
+        },
+        {
+          "title": "Specialisttandvård för barn",
+          "description": "Specialisttandvård för barn och unga upp till 19 år med avtal från Region Skåne. Trygg, omtänksam och professionell vård för de yngsta.",
+          "expandedDescription": "Vi har avtal med Region Skåne – även för barn och unga\nBaltzar Tandvård erbjuder specialisttandvård för både vuxna och barn genom avtal med Region Skåne.\n\nFör barn och unga upp till 19 år:\nVi är ackrediterade att erbjuda specialisttandvård inom ramen för Region Skånes vårdvalssystem. Det innebär att barn och unga upp till och med det år de fyller 19 kan få avgiftsfri specialisttandvård hos oss – med remiss från tandläkare eller läkare.\n\nFör vuxna patienter:\nVi är anslutna till det nationella tandvårdsstödet och det särskilda högkostnadsskyddet. Du får specialistvård med samma ekonomiska villkor som inom den offentliga vården."
+        }
+      ]
+    },
+    "technology": {
+      "title": "Digital Tandvårdsteknologi",
+      "subtitle": "På Baltzar Tandvård investerar vi i den senaste digitala teknologin för att ge dig säkrare, bekvämare och mer precisa behandlingar.",
+      "items": [
+        {
+          "title": "Digital Röntgen",
+          "description": "Digital panoramaröntgen med minimal strålning för säker och detaljerad diagnostik av hela käken.",
+          "expandedDescription": "Digital panoramaröntgen – säker och effektiv diagnostik\nPå Baltzar Tandvård använder vi digital panoramaröntgen för att skapa en komplett överblick över hela käken i en enda bild. Denna teknik är ett viktigt verktyg i vår diagnostik och behandlingsplanering.\n\nMed panoramaröntgen kan vi:\n\nBedöma tändernas placering, benstruktur och rotstatus\n\nUpptäcka infektioner, cystor eller andra förändringar i käkbenet\n\nFörbereda för behandlingar som implantat, extraktioner eller protetik\n\nVår utrustning har låg stråldos och bildkvalitet i hög upplösning, vilket gör undersökningen både trygg och effektiv.\n\nDigital bildhantering gör att vi snabbt kan analysera, dela och arkivera dina röntgenbilder – och även samverka med remittenter vid behov.\n\nHos oss är diagnostik ett första steg mot en trygg och träffsäker behandling."
+        },
+        {
+          "title": "Intraoral 3D-scanning",
+          "description": "Digital avtryckstagning utan obehag för perfekt passform.",
+          "expandedDescription": "Våra avancerade intraorala 3D-skannrar ersätter konventionella avtryck med en snabb och bekväm digital process.\n\nGenom att använda en liten handhållen kamera kan vi skapa en exakt digital modell av dina tänder och tandkött på bara några minuter, helt utan det obehag som traditionella avtrycksmaterial kan orsaka.\n\nFördelar med digital avtryckstagning:\n• Bekväm och snabb process utan kvälningskänsla\n• Extrem precision för bättre passform på kronor och proteser\n• Omedelbar visualisering av digitala modeller\n• Enkel lagring och åtkomst till digitala avtryck\n• Miljövänlig metod som eliminerar materialavfall\n\nDe digitala modellerna kan användas för allt från planering av Invisalign-behandlingar till design av kronor, broar och övriga protetiska arbeten."
+        },
+        {
+          "title": "CAD/CAM Teknologi",
+          "description": "Datorstödd design och tillverkning för precisionskomponenter.",
+          "expandedDescription": "CAD/CAM (Computer-Aided Design/Computer-Aided Manufacturing) är grundläggande för vår digitala tandvårdsprocess och möjliggör designen och tillverkningen av tandproteser med oöverträffad precision.\n\nEfter 3D-scanning av munnen använder vi avancerad CAD-programvara för att:\n• Designa kronor, broar och implantatkomponenter med mikrometer-precision\n• Virtuellt simulera funktion och estetik innan tillverkning\n• Optimera material och geometri för maximal hållbarhet\n• Kommunicera digitalt med patienten om designalternativ\n\nNär designen är färdig skickas den till våra CAM-system (fräsmaskiner och 3D-skrivare) som tillverkar den slutliga produkten med exakt samma specifikationer som i den digitala designen.\n\nDetta ger oss möjlighet att tillverka tandproteser med en passform, funktion och estetik som är överlägsen traditionellt hantverksmässigt framställda alternativ."
+        },
+        {
+          "title": "AI-assisterad Analys",
+          "description": "Artificiell intelligens för förbättrad diagnostik och behandlingsplanering.",
+          "expandedDescription": "Vi använder avancerade AI-system som kompletterar våra tandläkares expertis och förbättrar diagnostisk precision och behandlingsresultat.\n\nVåra AI-algoritmer är tränade på miljontals tandvårdsdata och hjälper till att:\n• Identifiera karies, sprickor och periapikala lesioner som kan vara svåra att upptäcka\n• Analysera bettutveckling och föreslå optimal ortodontisk behandling\n• Förutsäga långsiktiga utfall av olika behandlingsalternativ\n• Upptäcka tidiga tecken på tandköttsproblem och andra riskfaktorer\n• Optimera design av tandproteser baserat på biomekaniska principer\n\nAI-teknologin fungerar som ett beslutsstöd för våra kliniker, och varje AI-förslag granskas noggrant av våra specialister. Detta ger en kombination av teknologisk precision och mänsklig expertis för bästa möjliga vård."
+        },
+        {
+          "title": "Digital Behandlingsplanering",
+          "description": "Interaktiv planering och visualisering av behandlingsresultat.",
+          "expandedDescription": "Vår digitala behandlingsplanering gör det möjligt att simulera, visualisera och optimera din behandling innan den påbörjas.\n\nMed avancerad mjukvara kan vi:\n• Skapa en digital tvilling av din munhåla för virtuell behandlingssimulering\n• Visualisera slutresultatet av estetiska behandlingar\n• Simulera tandförflyttning vid ortodontisk behandling\n• Optimera implantatpositioner för bästa funktion och estetik\n• Planera komplexa rekonstruktioner steg för steg\n\nDenna teknologi ger inte bara bättre behandlingsresultat utan gör dig också till en aktiv deltagare i planeringen. Du kan se olika behandlingsalternativ, förstå processen bättre och ha realistiska förväntningar på slutresultatet.\n\nDigital behandlingsplanering minskar även risken för oväntade komplikationer under behandlingen, då många potentiella problem kan identifieras och lösas i den virtuella planeringsfasen."
+        },
+        {
+          "title": "3D-printade Guider & Modeller",
+          "description": "Skräddarsydda kirurgiska guider och arbetsmodeller för precision.",
+          "expandedDescription": "Vi använder avancerad 3D-printteknologi för att tillverka precisionskomponenter som är avgörande för moderna tandvårdsbehandlingar.\n\nBaserat på digitala 3D-scanningar och behandlingsplaneringar kan vi printa:\n• Kirurgiska guider för exakt implantatplacering\n• Arbetsmodeller för protetisk tillverkning\n• Temporära proteser och behandlingsskydd\n• Ortodontiska skenor för tandreglering\n• Demonstrationsmodeller för patientutbildning\n\nVåra 3D-printrar använder biokompatibla material med medicinsk certifiering och kan producera komponenter med mikrometerprecision.\n\n3D-printade kirurgiska guider är särskilt värdefulla vid implantatbehandlingar, då de säkerställer att implantaten placeras exakt enligt den digitala planen, vilket minimerar risker och optimerar behandlingsresultatet."
+        },
+        {
+          "title": "Augmented Reality",
+          "description": "Simulera din behandling i 3D – innan behandlingen ens har börjat.",
+          "expandedDescription": "Augmented Reality – Se ditt leende innan behandlingen\nPå Baltzar Tandvård använder vi Augmented Reality (AR) för att ge dig en visuell förhandsgranskning av ditt framtida leende – redan innan behandlingen påbörjas.\n\nGenom att kombinera:\n\nHögupplösta fotografier\n\nIntraorala 3D-skanningar\n\nDigital design\n\n…kan vi skapa en realistisk 3D-simulering av ditt framtida behandlingsresultat. Du får se exakt hur dina tänder kan komma att se ut – vilket skapar trygghet, förtroende och delaktighet i din behandling.\n\nDet är en del av vår filosofi: tandvård ska inte bara kännas rätt – den ska också se rätt ut."
+        }
+      ],
+      "readMoreButton": "Läs mer",
+      "closeButton": "Stäng"
+    },
+    "testimonials": {
+      "title": "Vad Våra Patienter Säger",
+      "subtitle": "Läs om erfarenheter från våra nöjda patienter",
+      "items": [
+        {
+          "content": "Teamet på Baltzar Tandvård gav exceptionell service. Proceduren var smärtfri och resultaten är fantastiska!",
+          "name": "Emma Johansson",
+          "role": "Patient sedan 2019"
+        },
+        {
+          "content": "Jag har varit rädd för tandläkare hela mitt liv, men personalen här fick mig att känna mig bekväm och avslappnad.",
+          "name": "Mikael Svensson",
+          "role": "Patient sedan 2020"
+        },
+        {
+          "content": "Den mest professionella tandkliniken jag någonsin besökt. Toppmodern utrustning och vänlig personal.",
+          "name": "Sara Wiklund",
+          "role": "Patient sedan 2018"
+        }
+      ]
+    },
+    "blog": {
+      "title": "Blogg om Tandhälsa",
+      "subtitle": "Tips och insikter för att upprätthålla optimal munhälsa",
+      "viewAllButton": "Visa Alla Inlägg",
+      "readMoreButton": "Läs Mer",
+      "posts": [
+        {
+          "title": "5 Tips för att Upprätthålla Friska Tänder",
+          "date": "15 juni 2023",
+          "excerpt": "Lär dig de viktiga dagliga vanorna som kan hjälpa dig att upprätthålla friska tänder och förebygga vanliga tandproblem.",
+          "slug": "tips-for-friska-tander"
+        },
+        {
+          "title": "Förstå Tandimplantat",
+          "date": "22 maj 2023",
+          "excerpt": "Allt du behöver veta om tandimplantat, från proceduren till återhämtning och underhåll.",
+          "slug": "forsta-tandimplantat"
+        },
+        {
+          "title": "Sambandet Mellan Munhälsa och Allmänt Välbefinnande",
+          "date": "10 april 2023",
+          "excerpt": "Upptäck hur din munhälsa kan påverka ditt allmänna fysiska välbefinnande och varför regelbundna tandläkarbesök är avgörande.",
+          "slug": "munhalsa-och-valbefinnande"
+        }
+      ]
+    }
+  },
+  "contact": {
+    "title": "Kontakta Oss",
+    "subtitle": "Vi tar emot nya patienter och hjälper gärna till med frågor om våra behandlingar. Kontakta oss via formuläret eller använd våra kontaktuppgifter nedan.",
+    "address": "Baltzargatan 25, 211 36 Malmö",
+    "phone": "+4640123456",
+    "email": "info@baltzartandvard.se",
+    "hours": "Måndag-Fredag: 08:00-17:00\nLördag-Söndag: Stängt",
+    "form": {
+      "name": "Namn",
+      "email": "E-post",
+      "phone": "Telefon",
+      "message": "Meddelande",
+      "submit": "Skicka Meddelande"
+    }
+  },
+  "footer": {
+    "company": {
+      "title": "Företag",
+      "links": [
+        { "name": "Om Oss", "href": "/about" },
+        { "name": "Vårt Team", "href": "/staff" },
+        { "name": "Karriär", "href": "/careers" },
+        { "name": "Nyheter", "href": "/news" }
+      ]
+    },
+    "services": {
+      "title": "Tjänster",
+      "links": [
+        { "name": "Digital Implantatbehandling", "href": "/services/implants" },
+        { "name": "Estetisk Tandvård", "href": "/services/cosmetic" },
+        { "name": "Allmän Tandvård", "href": "/services/general" },
+        { "name": "Specialisttandvård för barn", "href": "/services/children" }
+      ]
+    },
+    "contact": {
+      "title": "Kontakt",
+      "address": "Baltzargatan 25, 211 36 Malmö",
+      "phone": "+4640123456",
+      "email": "info@baltzartandvard.se"
+    },
+    "social": {
+      "title": "Följ Oss"
+    },
+    "copyright": "Alla rättigheter förbehållna."
+  },
+  "services": {
+    "title": "Våra Behandlingar",
+    "subtitle": "På Baltzar Tandvård erbjuder vi allt från allmän tandvård till specialiserade behandlingar med digital precision.",
+    "items": [
+      {
+        "title": "Digital Implantatbehandling",
+        "description": "Planerad och utförd med 3D-teknik för bästa resultat och minimala ingrepp.",
+        "expandedDescription": "Våra digitala implantatbehandlingar representerar det absolut senaste inom modern tandvård. Genom att kombinera 3D röntgen, digital scanning och datorassisterad kirurgi kan vi:\n• Planera exakt placering av tandimplantat virtuellt innan behandlingen börjar\n• Tillverka precisionsguider för kirurgisk placering\n• Minimera kirurgiska ingrepp och minska återhämtningstiden\n• Uppnå bättre estetiska och funktionella resultat\n• Skapa en förutsägbar och säker behandlingsprocess\n\nDenna teknik gör att vi kan genomföra implantatbehandlingar med högre precision, mindre obehag och bättre slutresultat än med traditionella metoder."
+      },
+      {
+        "title": "Estetisk Tandvård",
+        "description": "Förbättra ditt leende med fasader, kronor och blekning designade för ett naturligt resultat.",
+        "expandedDescription": "Vår estetiska tandvård kombinerar vetenskap och konst för att skapa vackra leenden som ser naturliga ut och håller länge.\n\nVi erbjuder en rad estetiska behandlingar, inklusive:\n• Porslinsfasader - tunna skal som fästs på framsidan av tänderna för att korrigera missfärgningar, ojämnheter eller mellanrum\n• Keramiska kronor - fullständiga \"kåpor\" som återställer skadade tänder med både funktion och utseende\n• Tandblekning - professionella system för effektiv och skonsam uppljusning av tänderna\n• Estetiska kompositfyllningar - tandfärgade fyllningar som är både funktionella och estetiska\n• Tandsmycken och andra estetiska detaljer\n\nMed hjälp av digital fotografering och virtuell planering kan du se ditt nya leende innan behandlingen ens påbörjas."
+      },
+      {
+        "title": "Allmän Tandvård",
+        "description": "Regelbunden vård med fokus på prevention och långsiktig tandhälsa.",
+        "expandedDescription": "Vi erbjuder alla typer av allmän tandvård med fokus på förebyggande behandling och långsiktig munhälsa.\n\nVåra allmänna tandvårdstjänster inkluderar:\n• Omfattande undersökningar med digital röntgen för tidig diagnostik\n• Professionell tandrengöring och munhygienråd\n• Estetiska tandfyllningar med moderna material\n• Rotbehandlingar med avancerad teknik för bättre resultat\n• Behandling av tandköttsproblem och förebyggande av tandlossning\n• Stöd och råd för hemmarutiner som främjar god munhälsa\n\nVi lägger stor vikt vid tidig diagnos och förebyggande behandling för att undvika mer omfattande och kostsamma behandlingar i framtiden."
+      },
+      {
+        "title": "Specialisttandvård för barn",
+        "description": "Specialisttandvård för barn och unga upp till 19 år med avtal från Region Skåne. Trygg, omtänksam och professionell vård för de yngsta.",
+        "expandedDescription": "Vi har avtal med Region Skåne – även för barn och unga\nBaltzar Tandvård erbjuder specialisttandvård för både vuxna och barn genom avtal med Region Skåne.\n\nFör barn och unga upp till 19 år:\nVi är ackrediterade att erbjuda specialisttandvård inom ramen för Region Skånes vårdvalssystem. Det innebär att barn och unga upp till och med det år de fyller 19 kan få avgiftsfri specialisttandvård hos oss – med remiss från tandläkare eller läkare.\n\nFör vuxna patienter:\nVi är anslutna till det nationella tandvårdsstödet och det särskilda högkostnadsskyddet. Du får specialistvård med samma ekonomiska villkor som inom den offentliga vården."
+      },
+      {
+        "title": "Invisalign Ortodonti",
+        "description": "Osynlig tandreglering för både vuxna och ungdomar.",
+        "expandedDescription": "Invisalign är ett modernt alternativ till traditionell tandställning, där genomskinliga, avtagbara aligners används för att gradvis flytta tänderna till rätt position.\n\nFördelarna med Invisalign inkluderar:\n• Nästan osynliga skenor som få andra lägger märke till\n• Avtagbara aligners som gör det möjligt att äta, borsta och använda tandtråd som vanligt\n• Digital planering där du kan se slutresultatet innan behandlingen börjar\n• Färre besök på kliniken jämfört med konventionell tandreglering\n• Ofta kortare behandlingstid än med traditionell ortodonti\n• Ökad komfort utan metallbågar och trådar\n\nSom certifierade Invisalign-behandlare erbjuder vi detta alternativ för både vuxna och ungdomar som vill rätta till sneda tänder diskret och bekvämt."
+      },
+      {
+        "title": "Digital Protetik",
+        "description": "Skräddarsydda proteser designade och tillverkade med digital precision.",
+        "expandedDescription": "Vår digitala protetik representerar nästa generation av tandersättningar med överlägsna resultat på både funktion och estetik.\n\nVi erbjuder digitalt designade och tillverkade:\n• Kronor och broar med perfekt passform och funktion\n• Implantatstödda konstruktioner för enstaka tänder eller hela bettet\n• Partiella och helproteser med optimal komfort\n• Bettskydd och snarkskynor\n• Temporära proteser tillverkade på plats med 3D-skrivare\n\nGenom att använda digital scanning istället för konventionella avtryck får vi exakta digitala modeller av dina tänder, vilket resulterar i proteser med bättre passform, utseende och funktion.\n\nVårt eget digitala laboratorium möjliggör snabbare leverans och högre precision än med traditionella protetiska lösningar."
+      }
+    ]
+  },
+  "technology": {
+    "title": "Digital Tandvårdsteknologi",
+    "subtitle": "På Baltzar Tandvård investerar vi i den senaste digitala teknologin för att ge dig säkrare, bekvämare och mer precisa behandlingar.",
+    "items": [
+      {
+        "title": "Digital Röntgen",
+        "description": "Digital panoramaröntgen med minimal strålning för säker och detaljerad diagnostik av hela käken.",
+        "expandedDescription": "Digital panoramaröntgen – säker och effektiv diagnostik\nPå Baltzar Tandvård använder vi digital panoramaröntgen för att skapa en komplett överblick över hela käken i en enda bild. Denna teknik är ett viktigt verktyg i vår diagnostik och behandlingsplanering.\n\nMed panoramaröntgen kan vi:\n\nBedöma tändernas placering, benstruktur och rotstatus\n\nUpptäcka infektioner, cystor eller andra förändringar i käkbenet\n\nFörbereda för behandlingar som implantat, extraktioner eller protetik\n\nVår utrustning har låg stråldos och bildkvalitet i hög upplösning, vilket gör undersökningen både trygg och effektiv.\n\nDigital bildhantering gör att vi snabbt kan analysera, dela och arkivera dina röntgenbilder – och även samverka med remittenter vid behov.\n\nHos oss är diagnostik ett första steg mot en trygg och träffsäker behandling."
+      },
+      {
+        "title": "Intraoral 3D-scanning",
+        "description": "Digital avtryckstagning utan obehag för perfekt passform.",
+        "expandedDescription": "Våra avancerade intraorala 3D-skannrar ersätter konventionella avtryck med en snabb och bekväm digital process.\n\nGenom att använda en liten handhållen kamera kan vi skapa en exakt digital modell av dina tänder och tandkött på bara några minuter, helt utan det obehag som traditionella avtrycksmaterial kan orsaka.\n\nFördelar med digital avtryckstagning:\n• Bekväm och snabb process utan kvälningskänsla\n• Extrem precision för bättre passform på kronor och proteser\n• Omedelbar visualisering av digitala modeller\n• Enkel lagring och åtkomst till digitala avtryck\n• Miljövänlig metod som eliminerar materialavfall\n\nDe digitala modellerna kan användas för allt från planering av Invisalign-behandlingar till design av kronor, broar och övriga protetiska arbeten."
+      },
+      {
+        "title": "CAD/CAM Teknologi",
+        "description": "Datorstödd design och tillverkning för precisionskomponenter.",
+        "expandedDescription": "CAD/CAM (Computer-Aided Design/Computer-Aided Manufacturing) är grundläggande för vår digitala tandvårdsprocess och möjliggör designen och tillverkningen av tandproteser med oöverträffad precision.\n\nEfter 3D-scanning av munnen använder vi avancerad CAD-programvara för att:\n• Designa kronor, broar och implantatkomponenter med mikrometer-precision\n• Virtuellt simulera funktion och estetik innan tillverkning\n• Optimera material och geometri för maximal hållbarhet\n• Kommunicera digitalt med patienten om designalternativ\n\nNär designen är färdig skickas den till våra CAM-system (fräsmaskiner och 3D-skrivare) som tillverkar den slutliga produkten med exakt samma specifikationer som i den digitala designen.\n\nDetta ger oss möjlighet att tillverka tandproteser med en passform, funktion och estetik som är överlägsen traditionellt hantverksmässigt framställda alternativ."
+      },
+      {
+        "title": "AI-assisterad Analys",
+        "description": "Artificiell intelligens för förbättrad diagnostik och behandlingsplanering.",
+        "expandedDescription": "Vi använder avancerade AI-system som kompletterar våra tandläkares expertis och förbättrar diagnostisk precision och behandlingsresultat.\n\nVåra AI-algoritmer är tränade på miljontals tandvårdsdata och hjälper till att:\n• Identifiera karies, sprickor och periapikala lesioner som kan vara svåra att upptäcka\n• Analysera bettutveckling och föreslå optimal ortodontisk behandling\n• Förutsäga långsiktiga utfall av olika behandlingsalternativ\n• Upptäcka tidiga tecken på tandköttsproblem och andra riskfaktorer\n• Optimera design av tandproteser baserat på biomekaniska principer\n\nAI-teknologin fungerar som ett beslutsstöd för våra kliniker, och varje AI-förslag granskas noggrant av våra specialister. Detta ger en kombination av teknologisk precision och mänsklig expertis för bästa möjliga vård."
+      },
+      {
+        "title": "Digital Behandlingsplanering",
+        "description": "Interaktiv planering och visualisering av behandlingsresultat.",
+        "expandedDescription": "Vår digitala behandlingsplanering gör det möjligt att simulera, visualisera och optimera din behandling innan den påbörjas.\n\nMed avancerad mjukvara kan vi:\n• Skapa en digital tvilling av din munhåla för virtuell behandlingssimulering\n• Visualisera slutresultatet av estetiska behandlingar\n• Simulera tandförflyttning vid ortodontisk behandling\n• Optimera implantatpositioner för bästa funktion och estetik\n• Planera komplexa rekonstruktioner steg för steg\n\nDenna teknologi ger inte bara bättre behandlingsresultat utan gör dig också till en aktiv deltagare i planeringen. Du kan se olika behandlingsalternativ, förstå processen bättre och ha realistiska förväntningar på slutresultatet.\n\nDigital behandlingsplanering minskar även risken för oväntade komplikationer under behandlingen, då många potentiella problem kan identifieras och lösas i den virtuella planeringsfasen."
+      },
+      {
+        "title": "3D-printade Guider & Modeller",
+        "description": "Skräddarsydda kirurgiska guider och arbetsmodeller för precision.",
+        "expandedDescription": "Vi använder avancerad 3D-printteknologi för att tillverka precisionskomponenter som är avgörande för moderna tandvårdsbehandlingar.\n\nBaserat på digitala 3D-scanningar och behandlingsplaneringar kan vi printa:\n• Kirurgiska guider för exakt implantatplacering\n• Arbetsmodeller för protetisk tillverkning\n• Temporära proteser och behandlingsskydd\n• Ortodontiska skenor för tandreglering\n• Demonstrationsmodeller för patientutbildning\n\nVåra 3D-printrar använder biokompatibla material med medicinsk certifiering och kan producera komponenter med mikrometerprecision.\n\n3D-printade kirurgiska guider är särskilt värdefulla vid implantatbehandlingar, då de säkerställer att implantaten placeras exakt enligt den digitala planen, vilket minimerar risker och optimerar behandlingsresultatet."
+      },
+      {
+        "title": "Augmented Reality",
+        "description": "Simulera din behandling i 3D – innan behandlingen ens har börjat.",
+        "expandedDescription": "Augmented Reality – Se ditt leende innan behandlingen\nPå Baltzar Tandvård använder vi Augmented Reality (AR) för att ge dig en visuell förhandsgranskning av ditt framtida leende – redan innan behandlingen påbörjas.\n\nGenom att kombinera:\n\nHögupplösta fotografier\n\nIntraorala 3D-skanningar\n\nDigital design\n\n…kan vi skapa en realistisk 3D-simulering av ditt framtida behandlingsresultat. Du får se exakt hur dina tänder kan komma att se ut – vilket skapar trygghet, förtroende och delaktighet i din behandling.\n\nDet är en del av vår filosofi: tandvård ska inte bara kännas rätt – den ska också se rätt ut."
+      }
+    ],
+    "readMoreButton": "Läs mer",
+    "closeButton": "Stäng"
+  }
+}
