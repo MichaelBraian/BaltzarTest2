@@ -53,7 +53,13 @@ export class PatientService {
     try {
       // First try to get details from Muntra
       const muntraPatient = await muntraService.getPatientDetails(patientId)
-      return muntraPatient
+      // Add required fields that Muntra API doesn't provide
+      return {
+        ...muntraPatient,
+        phone: muntraPatient.phoneNumberCell || muntraPatient.phoneNumberHome || muntraPatient.phoneNumberWork,
+        createdAt: new Date().toISOString(), // Use current time as fallback
+        updatedAt: new Date().toISOString(), // Use current time as fallback
+      } as Patient
     } catch (error) {
       console.error('Muntra get details failed, falling back to local details:', error)
       // Fallback to local details if Muntra fails
@@ -74,7 +80,13 @@ export class PatientService {
     try {
       // First try to update in Muntra
       const muntraPatient = await muntraService.updatePatientProfile(patientId, data)
-      return muntraPatient
+      // Add required fields that Muntra API doesn't provide
+      return {
+        ...muntraPatient,
+        phone: muntraPatient.phoneNumberCell || muntraPatient.phoneNumberHome || muntraPatient.phoneNumberWork,
+        createdAt: new Date().toISOString(), // Use current time as fallback
+        updatedAt: new Date().toISOString(), // Use current time as fallback
+      } as Patient
     } catch (error) {
       console.error('Muntra update failed, falling back to local update:', error)
       // Fallback to local update if Muntra fails
