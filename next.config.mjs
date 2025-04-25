@@ -5,7 +5,10 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['localhost:3000', process.env.NEXT_PUBLIC_SITE_URL],
+      bodySizeLimit: '2mb'
+    }
   },
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
