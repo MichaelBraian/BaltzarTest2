@@ -12,15 +12,14 @@ interface AppointmentType {
 }
 
 interface BookingFormProps {
-  patientId: string | undefined
   appointmentTypes: AppointmentType[]
 }
 
-export function BookingForm({ patientId, appointmentTypes }: BookingFormProps) {
+export function BookingForm({ appointmentTypes }: BookingFormProps) {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -30,24 +29,29 @@ export function BookingForm({ patientId, appointmentTypes }: BookingFormProps) {
     const formData = new FormData(e.currentTarget)
     const appointmentTypeId = formData.get('appointmentType') as string
     const date = formData.get('date') as string
-    const time = formData.get('time') as string
+    const preferredTime = formData.get('preferredTime') as string
 
     try {
-      // Create the appointment
-      const { error: bookingError } = await supabase.from('appointments').insert({
-        patient_id: patientId,
-        appointment_type_id: appointmentTypeId,
-        start_time: `${date}T${time}`,
-        status: 'pending',
-      })
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
 
-      if (bookingError) throw bookingError
+      const { error: insertError } = await supabase
+        .from('appointments')
+        .insert({
+          patient_id: session.user.id,
+          appointment_type_id: appointmentTypeId,
+          date: date,
+          preferred_time: preferredTime,
+          status: 'pending'
+        })
+
+      if (insertError) throw insertError
 
       router.push('/dashboard/appointments')
-      router.refresh()
     } catch (err) {
-      setError('Failed to book appointment. Please try again.')
-      console.error('Booking error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to book appointment')
     } finally {
       setLoading(false)
     }
@@ -56,14 +60,13 @@ export function BookingForm({ patientId, appointmentTypes }: BookingFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md">{error}</div>
+        <div className="bg-red-50 text-red-500 p-4 rounded-md">
+          {error}
+        </div>
       )}
 
       <div>
-        <label
-          htmlFor="appointmentType"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="appointmentType" className="block text-sm font-medium text-gray-700">
           Appointment Type
         </label>
         <select
@@ -82,10 +85,7 @@ export function BookingForm({ patientId, appointmentTypes }: BookingFormProps) {
       </div>
 
       <div>
-        <label
-          htmlFor="date"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="date" className="block text-sm font-medium text-gray-700">
           Date
         </label>
         <input
@@ -99,30 +99,25 @@ export function BookingForm({ patientId, appointmentTypes }: BookingFormProps) {
       </div>
 
       <div>
-        <label
-          htmlFor="time"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="preferredTime" className="block text-sm font-medium text-gray-700">
           Preferred Time
         </label>
         <input
           type="time"
-          id="time"
-          name="time"
+          id="preferredTime"
+          name="preferredTime"
           required
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
 
-      <div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-        >
-          {loading ? 'Booking...' : 'Book Appointment'}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+      >
+        {loading ? 'Booking...' : 'Book Appointment'}
+      </button>
     </form>
   )
 } 
