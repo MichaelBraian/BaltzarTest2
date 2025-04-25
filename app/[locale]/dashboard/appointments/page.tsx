@@ -10,6 +10,19 @@ export const metadata: Metadata = {
   description: 'View and manage your dental appointments',
 }
 
+// Define appointment type
+interface Appointment {
+  id: string
+  date: string
+  time: string
+  type: string
+  dentist: string
+  location: string
+  duration: number
+  notes?: string
+  status?: 'scheduled' | 'completed' | 'cancelled'
+}
+
 // Define the params type for Next.js 15
 type Props = {
   params: Promise<{ locale: string }>
@@ -71,6 +84,31 @@ export default async function AppointmentsPage({ params }: Props) {
   if (!session) {
     // If no session, redirect to login
     redirect(`/${locale}/login`)
+  }
+  
+  // Fetch appointments from API
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  let appointmentsData: { upcoming: Appointment[], past: Appointment[] } = { upcoming: [], past: [] };
+  let apiMessage = '';
+  
+  try {
+    const response = await fetch(`${siteUrl}/api/appointments`, {
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`
+      },
+      next: { revalidate: 60 } // Revalidate every minute
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch appointments');
+    }
+
+    const data = await response.json();
+    appointmentsData = data.appointments;
+    apiMessage = data.message;
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    // Will use the default empty arrays if fetch fails
   }
   
   // Translations
@@ -144,13 +182,13 @@ export default async function AppointmentsPage({ params }: Props) {
           {t.upcoming}
         </h2>
         
-        {mockAppointments.upcoming.length === 0 ? (
+        {appointmentsData.upcoming.length === 0 ? (
           <div className="bg-gray-800 p-6 rounded-lg shadow border border-gray-700">
             <p className="text-gray-400">{t.noUpcoming}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {mockAppointments.upcoming.map(appointment => (
+            {appointmentsData.upcoming.map(appointment => (
               <div key={appointment.id} className="bg-gray-800 p-6 rounded-lg shadow border border-gray-700">
                 <div className="flex flex-col md:flex-row justify-between">
                   <div>
@@ -198,13 +236,13 @@ export default async function AppointmentsPage({ params }: Props) {
           {t.past}
         </h2>
         
-        {mockAppointments.past.length === 0 ? (
+        {appointmentsData.past.length === 0 ? (
           <div className="bg-gray-800 p-6 rounded-lg shadow border border-gray-700">
             <p className="text-gray-400">{t.noPast}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {mockAppointments.past.map(appointment => (
+            {appointmentsData.past.map(appointment => (
               <div key={appointment.id} className="bg-gray-800 p-6 rounded-lg shadow border border-gray-700">
                 <div className="opacity-75">
                   <h3 className="text-lg font-medium text-white mb-2">
@@ -234,6 +272,15 @@ export default async function AppointmentsPage({ params }: Props) {
           </div>
         )}
       </div>
+      
+      {/* API Note */}
+      {apiMessage && (
+        <div className="mt-8 p-4 border border-yellow-500/30 bg-yellow-900/10 rounded-md">
+          <p className="text-sm text-yellow-200">
+            <span className="font-medium">Note:</span> {apiMessage}
+          </p>
+        </div>
+      )}
     </div>
   )
 } 
