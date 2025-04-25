@@ -1,6 +1,9 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { format } from 'date-fns'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function AppointmentsPage() {
   const supabase = createServerClient()
 
@@ -8,11 +11,23 @@ export default async function AppointmentsPage() {
     data: { session },
   } = await supabase.auth.getSession()
 
-  const { data: appointments } = await supabase
+  // Handle case where session might be null during initial load or if user logs out
+  if (!session) {
+    // Optionally, redirect to login or return a loading/error state
+    // For now, return null or an empty state to avoid errors during build
+    return <div>Loading appointments or please log in...</div>; 
+  }
+
+  const { data: appointments, error } = await supabase
     .from('appointments')
     .select('*')
-    .eq('patient_id', session?.user.id)
+    .eq('patient_id', session.user.id) // Use session.user.id directly now that we've checked session
     .order('start_time', { ascending: true })
+
+  if (error) {
+    console.error("Error fetching appointments:", error);
+    return <div>Error loading appointments.</div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -48,7 +63,7 @@ export default async function AppointmentsPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {appointments?.map((appointment) => (
+            {(appointments || []).map((appointment) => (
               <tr key={appointment.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {format(new Date(appointment.start_time), 'PPP')}
@@ -91,6 +106,13 @@ export default async function AppointmentsPage() {
                 </td>
               </tr>
             ))}
+            {(!appointments || appointments.length === 0) && (
+              <tr>
+                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  No appointments found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
