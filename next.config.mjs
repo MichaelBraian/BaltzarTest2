@@ -1,30 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
-    domains: ['hebbkx1anhila5yf.public.blob.vercel-storage.com'],
-    formats: ['image/avif', 'image/webp'],
-    unoptimized: true, // Required for Netlify deployment
+    unoptimized: true,
   },
   experimental: {
-    // Remove optimizeCss as it requires the critters package
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
-    // Enable build cache
-    turbotrace: {
-      enabled: true,
-    },
+    serverActions: true,
   },
-  compiler: {
-    // Remove console.log in production
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  // Remove static export configuration to support dynamic routes
-  // output: 'export',
-  // Disable server-side features not supported in static exports
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-  // Disable type checking during build
-  typescript: {
-    ignoreBuildErrors: true,
+  env: {
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
 };
 
