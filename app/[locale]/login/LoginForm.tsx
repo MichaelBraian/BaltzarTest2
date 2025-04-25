@@ -55,6 +55,9 @@ export default function LoginForm({ locale }: LoginFormProps) {
         email,
         options: {
           emailRedirectTo: `${siteUrl}/auth/callback`,
+          data: {
+            locale: locale, // Store the locale in user metadata
+          }
         },
       })
 

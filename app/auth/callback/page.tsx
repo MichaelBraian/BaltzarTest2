@@ -8,6 +8,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 // Separate component that handles auth logic
 function AuthCallbackHandler() {
   const [message, setMessage] = useState<string>('Processing authentication...')
+  const [debugInfo, setDebugInfo] = useState<Record<string, any> | null>(null)
   const router = useRouter()
   const supabase = createClientComponentClient()
   
@@ -18,6 +19,9 @@ function AuthCallbackHandler() {
     const error = url.searchParams.get('error')
     const errorCode = url.searchParams.get('error_code')
     const errorDescription = url.searchParams.get('error_description')
+    
+    // Set debug info for troubleshooting
+    setDebugInfo({ code: code ? 'present' : 'missing', error, errorCode, errorDescription })
     
     async function handleAuthCallback() {
       // Handle error cases first
@@ -42,10 +46,13 @@ function AuthCallbackHandler() {
       if (code) {
         try {
           setMessage('Authenticating your session...')
+          console.log('Exchanging code for session...')
+          
           const { data, error } = await supabase.auth.exchangeCodeForSession(code)
           
           if (error) {
             console.error('Error exchanging code for session:', error)
+            setDebugInfo(prev => ({ ...prev, sessionError: error.message }))
             setMessage(`Authentication failed: ${error.message}. Redirecting...`)
             setTimeout(() => {
               router.push('/sv/login')
@@ -54,13 +61,25 @@ function AuthCallbackHandler() {
           }
           
           if (data.session) {
+            console.log('Session created successfully, user:', data.session.user.id)
+            setDebugInfo(prev => ({ 
+              ...prev, 
+              sessionCreated: true, 
+              userId: data.session.user.id,
+              metadata: data.session.user.user_metadata || {} 
+            }))
+            
             setMessage('Authentication successful! Redirecting...')
+            
             // Get user locale preference or default to 'sv'
             const locale = data.session.user?.user_metadata?.locale || 'sv'
-            setTimeout(() => {
-              router.push(`/${locale}/dashboard`)
-            }, 1000)
+            console.log('Using locale for redirect:', locale)
+            
+            // Force a hard reload to ensure session state is consistent
+            window.location.href = `/${locale}/dashboard`
           } else {
+            console.error('No session created after successful code exchange')
+            setDebugInfo(prev => ({ ...prev, noSession: true }))
             setMessage('No session created. Redirecting to login...')
             setTimeout(() => {
               router.push('/sv/login')
@@ -68,6 +87,7 @@ function AuthCallbackHandler() {
           }
         } catch (err) {
           console.error('Unexpected error processing auth code:', err)
+          setDebugInfo(prev => ({ ...prev, unexpectedError: String(err) }))
           setMessage('An unexpected error occurred. Redirecting to login...')
           setTimeout(() => {
             router.push('/sv/login')
@@ -77,6 +97,7 @@ function AuthCallbackHandler() {
       }
       
       // Default case - no code or error
+      console.log('No auth code or error found in URL')
       setMessage('No authentication data found. Redirecting to login...')
       setTimeout(() => {
         router.push('/sv/login')
@@ -88,7 +109,17 @@ function AuthCallbackHandler() {
   }, [router, supabase])
 
   return (
-    <p className="text-gray-600 dark:text-gray-300">{message}</p>
+    <div className="space-y-4">
+      <p className="text-gray-600 dark:text-gray-300">{message}</p>
+      {debugInfo && (
+        <details className="mt-4 border border-gray-700 rounded-md p-2 text-left">
+          <summary className="text-sm text-gray-400 cursor-pointer">Debug Info</summary>
+          <pre className="mt-2 text-xs text-gray-500 overflow-auto p-2 bg-gray-900 rounded">
+            {JSON.stringify(debugInfo, null, 2)}
+          </pre>
+        </details>
+      )}
+    </div>
   )
 }
 
