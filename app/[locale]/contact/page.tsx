@@ -1,28 +1,40 @@
 import { getDictionary } from "@/lib/dictionaries"
 import { ContactHero } from "@/components/contact-hero"
 import { ContactForm } from "@/components/contact-form"
-import { ContactInfo } from "@/components/contact-info"
 import { ContactMap } from "@/components/contact-map"
+import { ContactInfo } from "@/components/contact-info"
+import { Metadata } from "next"
 
-export default async function ContactPage({
-  params,
-}: {
-  params: { locale: string }
-}) {
-  const locale = params.locale
-  // Fetch dictionary data on the server
+// Define the params type for Next.js 15
+type Props = {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  const dict = await getDictionary(locale)
+  
+  return {
+    title: dict.navigation.contact,
+    description: "Contact Baltzar Tandvård - Advanced Specialist Dental Care",
+  }
+}
+
+export default async function ContactPage({ params }: Props) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
   const dict = await getDictionary(locale)
 
   return (
-    <div>
+    <main className="flex min-h-screen flex-col items-center justify-between">
       <ContactHero locale={locale} />
-      <div className="container py-16">
-        <div className="grid gap-12 lg:grid-cols-2">
-          <ContactForm dictionary={dict.contact} locale={locale} />
-          <ContactInfo dictionary={dict.contact} locale={locale} />
-        </div>
-      </div>
+      <ContactForm dictionary={dict.contact} locale={locale} />
       <ContactMap locale={locale} />
-    </div>
+      <ContactInfo dictionary={dict.contact} locale={locale} />
+    </main>
   )
 }
