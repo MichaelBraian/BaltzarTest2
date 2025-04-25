@@ -5,13 +5,24 @@ import { AboutDigitalDentistry } from "@/components/about-digital-dentistry"
 import { AboutHistory } from "@/components/about-history"
 import { AboutValues } from "@/components/about-values"
 import { AboutContact } from "@/components/about-contact"
+import { Metadata } from "next"
 
-// Use the correct type for Next.js pages
-export default async function AboutPage({
-  params,
-}: {
+interface PageProps {
   params: { locale: string }
-}) {
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const locale = params.locale
+  const dict = await getDictionary(locale)
+  
+  return {
+    title: dict.navigation.about,
+    description: "Learn more about Baltzar Tandvård - Advanced Specialist Dental Care",
+  }
+}
+
+export default async function AboutPage({ params }: PageProps) {
   const locale = params.locale
   const dict = await getDictionary(locale)
 
