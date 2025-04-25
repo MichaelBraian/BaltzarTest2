@@ -5,11 +5,16 @@ export const metadata: Metadata = {
   description: 'Comprehensive general dental care services at Baltzar Tandvård',
 }
 
-export default function GeneralDentistryPage({
-  params: { locale },
-}: {
-  params: { locale: string }
-}) {
+// Define the params type for Next.js 15
+type Props = {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function GeneralDentistryPage({ params }: Props) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center">
