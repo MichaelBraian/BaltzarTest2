@@ -1,0 +1,62 @@
+# Cursor Rules for Netlify Deployment
+
+## Always follow the Netlify Deployment Protocol
+
+When generating or modifying code, always ensure it follows the guidelines in NETLIFY_DEPLOYMENT_PROTOCOL.md.
+
+## Key Requirements
+
+1. **Next.js Configuration**:
+   - Always use `output: 'standalone'` in next.config.mjs
+   - Configure images with `unoptimized: true`
+   - Use proper experimental features format
+
+2. **TypeScript Compatibility**:
+   - Use correct page component types:
+     ```typescript
+     type Params = { locale: string }
+     export default function PageComponent({ params }: { params: Params })
+     ```
+   - Avoid using deprecated types
+   - Ensure all components follow Next.js 15 conventions
+
+3. **Environment Variables**:
+   - Use NEXT_PUBLIC_ prefix for client-side variables
+   - Include fallbacks for optional variables
+   - Document required variables
+
+4. **Netlify Configuration**:
+   - Ensure netlify.toml has correct build commands
+   - Set proper publish directory
+   - Configure environment variables
+   - Set up redirect rules for client-side routing
+
+5. **Build Process**:
+   - Use pnpm for package management
+   - Include all necessary dependencies
+   - Test build process locally
+
+6. **Error Handling**:
+   - Implement proper error boundaries
+   - Add fallbacks for failed data fetching
+   - Include loading states
+
+7. **Performance**:
+   - Use proper image optimization
+   - Implement code splitting
+   - Minimize client-side JavaScript
+
+## Deployment Checklist
+
+Before suggesting code changes, always verify:
+
+1. TypeScript compatibility
+2. Next.js configuration
+3. Environment variables
+4. Netlify configuration
+5. Error handling
+6. Performance optimization
+
+## Reference
+
+For detailed guidelines, always refer to NETLIFY_DEPLOYMENT_PROTOCOL.md. 
