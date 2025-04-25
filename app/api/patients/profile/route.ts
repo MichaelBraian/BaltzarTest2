@@ -7,11 +7,14 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   try {
+    console.log("Profile API: Starting request")
+    
     // Authenticate request using Supabase
     const supabase = createRouteHandlerClient({ cookies })
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
+      console.log("Profile API: No session found")
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -21,12 +24,15 @@ export async function GET(request: Request) {
     const userEmail = session.user.email
     
     if (!userEmail) {
+      console.log("Profile API: No user email found")
       return NextResponse.json(
         { error: 'User email not found' },
         { status: 400 }
       )
     }
 
+    console.log("Profile API: Processing request for", userEmail)
+    
     // Get user metadata for basic profile info
     const userData = session.user.user_metadata || {}
     
@@ -38,12 +44,28 @@ export async function GET(request: Request) {
       // Add more fields from user metadata as needed
     }
 
+    // First verify if the patient exists in Muntra
     try {
-      // Try to fetch patient data from Muntra, but don't fail completely if it doesn't work
-      // For development/testing, just use the mock data instead of calling Muntra
-      if (process.env.NODE_ENV === 'production' && process.env.MUNTRA_API_KEY) {
+      console.log("Profile API: Verifying patient in Muntra")
+      const verificationResult = await muntraService.verifyPatient(userEmail)
+      
+      if (!verificationResult.exists) {
+        console.log("Profile API: Patient not found in Muntra")
+        // Return basic profile if not found in Muntra
+        return NextResponse.json({
+          patient: basicProfile,
+          email: userEmail,
+          source: 'supabase'
+        })
+      }
+      
+      // If patient exists in Muntra and we have the patientId, get details
+      if (verificationResult.patientId) {
+        console.log("Profile API: Patient found, getting details with ID", verificationResult.patientId)
         try {
-          const patientData = await muntraService.getPatientDetails(userEmail)
+          const patientData = await muntraService.getPatientDetails(verificationResult.patientId)
+          
+          console.log("Profile API: Retrieved patient details")
           
           return NextResponse.json({
             patient: {
@@ -53,40 +75,38 @@ export async function GET(request: Request) {
               name: `${patientData.firstName} ${patientData.lastName}`,
               phone: patientData.phoneNumberCell || patientData.phoneNumberWork || patientData.phoneNumberHome || basicProfile.phone,
             },
-            email: userEmail
+            email: userEmail,
+            source: 'muntra'
           })
-        } catch (muntraError) {
-          console.log('Muntra integration error (using fallback):', muntraError)
-          // Continue with mock data if Muntra fails
+        } catch (detailsError) {
+          console.error('Profile API: Error getting patient details:', detailsError)
+          // If details fetch fails, fall back to basic profile + mock data
         }
       }
-      
-      // Mock data for development/testing or if Muntra fails
-      const mockPatientData = {
-        ...basicProfile,
-        lastVisit: '2023-01-15',
-        nextAppointment: '2023-08-20 at 14:30',
-        dentist: 'Dr. Sara Lindberg',
-        clinic: 'Baltzar Tandvård',
-        status: 'Regular Patient',
-        insurance: 'Folktandvården Insurance'
-      }
-      
-      return NextResponse.json({
-        patient: mockPatientData,
-        email: userEmail
-      })
-    } catch (error: any) {
-      // Log the error but still return basic profile data
-      console.error('Error fetching detailed patient data:', error)
-      
-      return NextResponse.json({
-        patient: basicProfile,
-        email: userEmail
-      })
+    } catch (verifyError) {
+      console.error('Profile API: Muntra verification error:', verifyError)
+      // If verification fails, continue with mock data
     }
+    
+    // Mock data for development/testing or if Muntra fails
+    console.log("Profile API: Using mock data")
+    const mockPatientData = {
+      ...basicProfile,
+      lastVisit: '2023-01-15',
+      nextAppointment: '2023-08-20 at 14:30',
+      dentist: 'Dr. Sara Lindberg',
+      clinic: 'Baltzar Tandvård',
+      status: 'Regular Patient',
+      insurance: 'Folktandvården Insurance'
+    }
+    
+    return NextResponse.json({
+      patient: mockPatientData,
+      email: userEmail,
+      source: 'mock'
+    })
   } catch (error) {
-    console.error('Error fetching patient profile:', error)
+    console.error('Profile API: Fatal error fetching patient profile:', error)
     return NextResponse.json(
       { error: 'Failed to fetch patient data' },
       { status: 500 }

@@ -75,22 +75,27 @@ export default function RegistrationForm({
     setError(null)
     
     try {
-      // Check if the email is already registered using signInWithOtp
-      // This will check if the email exists without actually sending an OTP
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      console.log("Verifying email:", email)
+      
+      // Check if this email already has an account using signInWithOtp
+      // We won't send the OTP, just check if the account exists
+      const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
-        password: 'check-if-exists-temp-password',
+        options: {
+          shouldCreateUser: false // Only check if user exists, don't create
+        }
       })
       
-      // If there's no auth error or the error is not "Invalid login credentials", 
-      // then the email likely exists
-      if (!authError || !authError.message.includes('Invalid login credentials')) {
+      // If there's no error with code 'user-not-found', then user likely exists
+      if (!signInError || signInError.message !== 'User not found') {
+        console.log("User likely exists:", signInError)
         setError(t.errorEmailExists)
         setIsLoading(false)
         return
       }
       
       // Verify if the patient exists in Muntra
+      console.log("Checking if patient exists in Muntra...")
       const verifyResponse = await fetch('/api/patients/verify', {
         method: 'POST',
         headers: {
@@ -100,6 +105,7 @@ export default function RegistrationForm({
       })
 
       const verifyData = await verifyResponse.json()
+      console.log("Muntra verification response:", verifyData)
 
       if (!verifyResponse.ok) {
         if (verifyData.code === 'NO_PATIENT_RECORD') {
@@ -111,6 +117,7 @@ export default function RegistrationForm({
 
       // Store patient info for registration
       setPatientInfo(verifyData.patient)
+      console.log("Moving to registration step with patient info:", verifyData.patient)
       
       // Move to step 2 - registration with password
       setStep('register')
@@ -146,6 +153,8 @@ export default function RegistrationForm({
     setError(null)
     
     try {
+      console.log("Registering new user with email:", email)
+      
       // Register with Supabase
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -162,6 +171,8 @@ export default function RegistrationForm({
       })
       
       if (signUpError) throw signUpError
+      
+      console.log("Registration successful:", data)
       
       // Successfully registered, redirect to dashboard or confirmation page
       router.push(`/${locale}/dashboard`)
