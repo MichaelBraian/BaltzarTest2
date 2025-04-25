@@ -1,16 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, AlertCircle, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface ProfileEditFormProps {
   user: User
   patientInfo: any
   locale: string
+}
+
+// Define validation types
+type ValidationErrors = {
+  fullName?: string;
+  phone?: string;
 }
 
 export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEditFormProps) {
@@ -29,6 +35,8 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+  const [isDirty, setIsDirty] = useState(false)
   
   // Translations
   const t = {
@@ -53,10 +61,55 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
     errorMessage: locale === 'sv'
       ? 'Det uppstod ett fel vid uppdatering av din profil. Försök igen senare.'
       : 'There was an error updating your profile. Please try again later.',
+    fullNameRequired: locale === 'sv'
+      ? 'Fullständigt namn krävs'
+      : 'Full name is required',
+    phoneInvalid: locale === 'sv'
+      ? 'Ogiltigt telefonnummer'
+      : 'Invalid phone number',
+    redirecting: locale === 'sv'
+      ? 'Omdirigerar...'
+      : 'Redirecting...',
   }
+  
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {}
+    
+    // Validate full name
+    if (!formData.fullName.trim()) {
+      errors.fullName = t.fullNameRequired
+    }
+    
+    // Validate phone number (basic validation)
+    if (formData.phone && !/^[+\d\s()-]{6,20}$/.test(formData.phone)) {
+      errors.phone = t.phoneInvalid
+    }
+    
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+  
+  // Set form as dirty when any field changes
+  useEffect(() => {
+    setIsDirty(true)
+  }, [formData])
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement
+    
+    // Clear validation error when field is changed
+    if (validationErrors[name as keyof ValidationErrors]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[name as keyof ValidationErrors]
+        return newErrors
+      })
+    }
+    
+    // Clear general error message
+    if (error) {
+      setError(null)
+    }
     
     // Handle checkbox inputs
     if (type === 'checkbox') {
@@ -69,6 +122,12 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return
+    }
+    
     setError(null)
     setIsSubmitting(true)
     
@@ -107,6 +166,7 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
       }
       
       setSuccess(true)
+      setIsDirty(false)
       
       // Refresh page after a short delay
       setTimeout(() => {
@@ -140,14 +200,21 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
       
       {/* Success message */}
       {success && (
-        <div className="bg-green-900/30 border border-green-700 p-4 rounded-lg">
-          <p className="text-green-400">{t.successMessage}</p>
+        <div className="bg-green-900/30 border border-green-700 p-4 rounded-lg flex items-start">
+          <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-green-400">{t.successMessage}</p>
+            {formData.preferredLanguage !== locale && (
+              <p className="text-green-500 text-sm mt-1">{t.redirecting}</p>
+            )}
+          </div>
         </div>
       )}
       
       {/* Error message */}
       {error && (
-        <div className="bg-red-900/30 border border-red-700 p-4 rounded-lg">
+        <div className="bg-red-900/30 border border-red-700 p-4 rounded-lg flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
           <p className="text-red-400">{error}</p>
         </div>
       )}
@@ -170,8 +237,16 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                className={`w-full px-3 py-2 bg-gray-700 border ${
+                  validationErrors.fullName 
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-gray-600 focus:ring-orange-500 focus:border-orange-500'
+                } rounded-md text-white`}
+                aria-invalid={!!validationErrors.fullName}
               />
+              {validationErrors.fullName && (
+                <p className="mt-1 text-sm text-red-400">{validationErrors.fullName}</p>
+              )}
             </div>
             
             {/* Phone */}
@@ -185,8 +260,16 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                className={`w-full px-3 py-2 bg-gray-700 border ${
+                  validationErrors.phone 
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-gray-600 focus:ring-orange-500 focus:border-orange-500'
+                } rounded-md text-white`}
+                aria-invalid={!!validationErrors.phone}
               />
+              {validationErrors.phone && (
+                <p className="mt-1 text-sm text-red-400">{validationErrors.phone}</p>
+              )}
             </div>
             
             {/* Email (read-only) */}
@@ -273,7 +356,7 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
           
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isDirty}
             className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:bg-orange-800 disabled:cursor-not-allowed flex justify-center items-center"
           >
             {isSubmitting ? (

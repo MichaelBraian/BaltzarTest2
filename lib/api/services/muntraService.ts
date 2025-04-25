@@ -146,15 +146,49 @@ export class MuntraService {
   }
 
   // Update patient profile in Muntra
-  // Note: This is a placeholder as the API docs don't show a direct patient update endpoint
-  // You may need to use a different endpoint or approach based on Muntra's requirements
   async updatePatientProfile(patientId: string, data: Partial<MuntraPatient>): Promise<MuntraPatient> {
     try {
-      // This is a placeholder - you'll need to implement the actual update logic
-      // based on Muntra's API requirements
-      console.warn('Patient update not implemented - check Muntra API documentation for the correct endpoint')
-      
-      // For now, just return the patient details
+      if (!patientId) {
+        throw new Error('Patient ID is required for updating profile')
+      }
+
+      // Get the required headers
+      const headers = this.getHeaders()
+
+      // Muntra API expects data in a specific format
+      // Map our patient data to Muntra's expected format
+      const patientData = {
+        attributes: {
+          first_name: data.firstName || null,
+          last_name: data.lastName || null,
+          phone_number_cell: data.phoneNumberCell || null,
+          e_mail_address: data.email || null,
+          // Add other fields as needed
+        }
+      }
+
+      // Make the API call to update the patient
+      const response = await fetch(`${this.baseUrl}/api/patients/${patientId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(patientData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Muntra API error:', errorData)
+        
+        // Handle specific error cases based on status
+        if (response.status === 404) {
+          throw new Error('Patient not found in Muntra system')
+        } else if (response.status === 401 || response.status === 403) {
+          throw new Error('Unauthorized access to Muntra API')
+        } else {
+          throw new Error(`Muntra API error: ${response.statusText}`)
+        }
+      }
+
+      // Get the updated patient details
       return this.getPatientDetails(patientId)
     } catch (error) {
       console.error('Muntra update patient error:', error)

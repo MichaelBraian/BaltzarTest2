@@ -38,37 +38,56 @@ export async function POST(request: Request) {
       )
     }
 
-    // Prepare data to update
+    // Get the patient ID from metadata or through a verification method
+    // First verify if the patient exists in Muntra by their email
+    const patientVerification = await muntraService.verifyPatient(userEmail)
+    
+    if (!patientVerification.exists || !patientVerification.patientId) {
+      return NextResponse.json(
+        { error: 'Patient not found in Muntra system' },
+        { status: 404 }
+      )
+    }
+
+    // Prepare data to update in Muntra format
+    const patientId = patientVerification.patientId
     const updateData = {
-      name: requestData.fullName,
-      phone: requestData.phone,
-      // Add other fields as necessary
+      firstName: requestData.fullName?.split(' ')[0] || '',
+      lastName: requestData.fullName?.split(' ').slice(1).join(' ') || '',
+      phoneNumberCell: requestData.phone || '',
+      email: userEmail,
+      // Map other fields as needed
     }
 
     try {
-      // Update patient data in Muntra
-      // This would be the real implementation in a production environment
-      // const updatedPatient = await muntraService.updatePatient(userEmail, updateData);
-      
-      // For now, just mock a successful response
-      const mockUpdatedData = {
-        ...updateData,
-        email: userEmail,
-        updatedAt: new Date().toISOString()
-      }
+      // Update patient data in Muntra using the actual service method
+      const updatedPatient = await muntraService.updatePatientProfile(patientId, updateData)
       
       return NextResponse.json({
         success: true,
-        patient: mockUpdatedData
+        patient: {
+          name: requestData.fullName,
+          phone: requestData.phone,
+          email: userEmail,
+          preferredLanguage: requestData.preferredLanguage,
+          emailNotifications: requestData.emailNotifications,
+          smsNotifications: requestData.smsNotifications,
+          updatedAt: new Date().toISOString()
+        }
       })
     } catch (error: any) {
       console.error('Error updating patient in Muntra:', error)
       
-      // Return a more specific error
-      if (error.status === 404) {
+      // Return a more specific error message based on the error
+      if (error.message.includes('not found')) {
         return NextResponse.json(
-          { error: 'Patient not found' },
+          { error: 'Patient not found in Muntra system' },
           { status: 404 }
+        )
+      } else if (error.message.includes('Unauthorized')) {
+        return NextResponse.json(
+          { error: 'Unauthorized access to Muntra API' },
+          { status: 401 }
         )
       }
       
