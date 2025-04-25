@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function LoginForm() {
   const supabase = createClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://baltzartandvardcursor.netlify.app'
 
   return (
     <Auth
@@ -13,7 +14,7 @@ export default function LoginForm() {
       appearance={{ theme: ThemeSupa }}
       theme="light"
       providers={['google']}
-      redirectTo={`${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`}
+      redirectTo={`${siteUrl}/auth/callback`}
     />
   )
 } 
