@@ -112,12 +112,13 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - auth/callback (auth callback path)
+     * - api/auth/callback (new auth callback API path)
+     * - auth/callback (legacy path)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!auth/callback|_next/static|_next/image|favicon.ico|public/).+)',
+    '/((?!api/auth/callback|auth/callback|_next/static|_next/image|favicon.ico|public/).+)',
   ],
 };

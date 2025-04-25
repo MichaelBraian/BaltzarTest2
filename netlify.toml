@@ -41,17 +41,17 @@
 [build.processing.images]
   compress = true
 
-# Auth callback must be handled by the Next.js app router
+# Auth callback should be handled by both path patterns
 [[redirects]]
   from = "/auth/callback"
-  to = "/auth/callback"
+  to = "/api/auth/callback"
   status = 200
   force = true
 
 # Handle auth callback with any query parameters
 [[redirects]]
   from = "/auth/callback*"
-  to = "/auth/callback:splat"
+  to = "/api/auth/callback:splat"
   status = 200
   force = true
 

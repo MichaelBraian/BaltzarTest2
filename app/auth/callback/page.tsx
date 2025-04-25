@@ -9,12 +9,26 @@ export default function AuthCallbackPage() {
   const [message, setMessage] = useState<string>('Processing your login...')
 
   useEffect(() => {
-    // Check if there are error parameters
+    // Check if there are auth parameters
+    const code = searchParams.get('code')
     const error = searchParams.get('error')
     const errorCode = searchParams.get('error_code')
     const errorDescription = searchParams.get('error_description')
 
-    // Process errors if present
+    // If there's a code or error, redirect to the API route to handle it properly
+    if (code || error || errorCode) {
+      console.log('Detected auth parameters, redirecting to API handler');
+      
+      // Construct the full URL with all query parameters
+      const queryString = Array.from(searchParams.entries())
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+        
+      window.location.href = `/api/auth/callback?${queryString}${window.location.hash || ''}`;
+      return;
+    }
+
+    // Process errors if present (for direct visits to the page)
     if (error || errorCode) {
       console.log('Auth error detected:', { error, errorCode, errorDescription })
       
