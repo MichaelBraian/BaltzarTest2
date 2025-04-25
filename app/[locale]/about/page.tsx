@@ -9,14 +9,15 @@ import { Metadata } from "next"
 
 // Define the params type for Next.js 15
 type Props = {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata(
   { params }: Props
 ): Promise<Metadata> {
-  const locale = params.locale
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
   const dict = await getDictionary(locale)
   
   return {
@@ -26,7 +27,8 @@ export async function generateMetadata(
 }
 
 export default async function AboutPage({ params }: Props) {
-  const locale = params.locale
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
   const dict = await getDictionary(locale)
 
   return (
