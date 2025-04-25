@@ -13,9 +13,10 @@ interface AppointmentType {
 
 interface BookingFormProps {
   appointmentTypes: AppointmentType[]
+  patientId?: string
 }
 
-export function BookingForm({ appointmentTypes }: BookingFormProps) {
+export function BookingForm({ appointmentTypes, patientId }: BookingFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,10 +38,13 @@ export function BookingForm({ appointmentTypes }: BookingFormProps) {
         throw new Error('Not authenticated')
       }
 
+      // Use the provided patientId if available, otherwise use the session user id
+      const patientIdToUse = patientId || session.user.id
+
       const { error: insertError } = await supabase
         .from('appointments')
         .insert({
-          patient_id: session.user.id,
+          patient_id: patientIdToUse,
           appointment_type_id: appointmentTypeId,
           date: date,
           preferred_time: preferredTime,
