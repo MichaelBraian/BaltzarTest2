@@ -9,11 +9,16 @@ export const metadata: Metadata = {
   description: 'Log in to your Baltzar Tandvård account',
 }
 
-export default async function LoginPage({
-  params: { locale },
-}: {
-  params: { locale: string }
-}) {
+// Define the params type for Next.js 15
+type Props = {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function LoginPage({ params }: Props) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  
   const supabase = createServerComponentClient({ cookies })
   
   const {
