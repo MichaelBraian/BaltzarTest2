@@ -13,8 +13,8 @@ const nextConfig = {
     // Remove console.log in production
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Enable static exports for Netlify
-  output: 'export',
+  // Remove static export configuration to support dynamic routes
+  // output: 'export',
   // Disable server-side features not supported in static exports
   serverRuntimeConfig: {},
   publicRuntimeConfig: {},
