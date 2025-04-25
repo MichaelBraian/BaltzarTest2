@@ -11,6 +11,21 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
+  const pathname = req.nextUrl.pathname
+  
+  // Check if the pathname is missing a locale
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+  )
+
+  // If it's missing a locale, redirect to the default locale
+  if (pathnameIsMissingLocale) {
+    const locale = i18n.defaultLocale
+    return NextResponse.redirect(
+      new URL(`/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`, req.url),
+    )
+  }
+
   // Define public paths that don't require authentication
   const publicPaths = [
     '/', 
@@ -24,34 +39,21 @@ export async function middleware(req: NextRequest) {
     '/terms-of-service'
   ]
 
-  const pathname = req.nextUrl.pathname
-  
-  // Check if the pathname is missing a locale
-  const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
-  )
-
-  // If it's missing a locale, redirect to the default locale
-  if (pathnameIsMissingLocale) {
-    const locale = i18n.defaultLocale
-
-    // e.g. incoming request is /products
-    // The new URL is now /en/products
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`, req.url),
-    )
-  }
-
   // Check if the current path is a public path
-  const isPublicPath = publicPaths.some(path => 
-    pathname === path || 
-    pathname.startsWith(`${path}/`) ||
-    // Also check for localized paths
-    i18n.locales.some(locale => 
-      pathname === `/${locale}${path}` || 
-      pathname.startsWith(`/${locale}${path}/`)
-    )
-  )
+  const isPublicPath = publicPaths.some(path => {
+    // Check exact match for root path with locale
+    if (path === '/' && i18n.locales.some(locale => pathname === `/${locale}`)) {
+      return true
+    }
+    
+    // Check other public paths
+    return pathname === path || 
+           pathname.startsWith(`${path}/`) ||
+           i18n.locales.some(locale => 
+             pathname === `/${locale}${path}` || 
+             pathname.startsWith(`/${locale}${path}/`)
+           )
+  })
 
   // If user is not signed in and the current path is not a public path,
   // redirect the user to /login
