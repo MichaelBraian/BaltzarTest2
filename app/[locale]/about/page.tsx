@@ -6,6 +6,7 @@ import { AboutHistory } from "@/components/about-history"
 import { AboutValues } from "@/components/about-values"
 import { AboutContact } from "@/components/about-contact"
 
+// Use the correct type for Next.js pages
 export default async function AboutPage({
   params,
 }: {

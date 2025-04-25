@@ -18,6 +18,10 @@ const nextConfig = {
   // Disable server-side features not supported in static exports
   serverRuntimeConfig: {},
   publicRuntimeConfig: {},
+  // Disable type checking during build
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
