@@ -4,11 +4,11 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-// Optimize font loading
+// Optimize font loading - disabled preload to prevent console warnings
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false,
   variable: "--font-inter",
 })
 
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     description: "Modern dental care with digital precision and personal attention in Malmö.",
     siteName: "Baltzar Tandvård",
   },
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({

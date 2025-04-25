@@ -159,7 +159,7 @@ export function Navigation({ locale }: { locale?: string }) {
             width={140}
             height={40}
             className="h-10 w-auto"
-            priority
+            loading="lazy"
           />
         </a>
 

@@ -21,6 +21,7 @@ export function Footer({
                 width={160}
                 height={45}
                 className="h-12 w-auto"
+                loading="lazy"
               />
             </div>
             <h3 className="mb-4 text-lg font-medium text-white">{dictionary.company.title}</h3>
