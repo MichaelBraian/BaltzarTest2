@@ -1,46 +1,38 @@
-import type React from "react"
-import { Inter } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Navigation } from "@/components/navigation"
-import { Footer } from "@/components/footer"
-import { PageTransition } from "@/components/page-transition"
-import { i18n } from "@/lib/i18n-config"
+import "./globals.css"
+import { Providers } from "@/components/providers"
 import { getDictionary } from "@/lib/dictionaries"
-import "@/app/globals.css"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
+import { Montserrat } from "next/font/google"
+import type { Metadata } from "next"
+import { ReactNode } from "react"
 
-const inter = Inter({ subsets: ["latin"] })
+const montserrat = Montserrat({ subsets: ["latin"] })
 
-export async function generateStaticParams() {
-  return i18n.locales.map((locale) => ({ locale }))
+export const metadata: Metadata = {
+  title: "Baltzar Tandvård",
+  description: "Advanced Specialist Dental Care",
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode
-  params: { locale: string }
-}) {
-  // Get the locale from params and validate it
-  const locale = params.locale
-  const isValidLocale = i18n.locales.includes(locale)
-  const validLocale = isValidLocale ? locale : i18n.defaultLocale
-  
-  // Get dictionary data
-  const dict = await getDictionary(validLocale)
+// Define the layout props type for Next.js 15
+type Props = {
+  children: ReactNode
+  params: Promise<{ locale: string }>
+}
+
+export default async function RootLayout({ children, params }: Props) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  const dict = await getDictionary(locale)
 
   return (
-    <html lang={validLocale} suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-foreground antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <div className="min-h-screen flex flex-col mx-auto max-w-screen-2xl w-full">
-            <Navigation locale={validLocale} />
-            <PageTransition>
-              <main className="flex-1">{children}</main>
-            </PageTransition>
-            <Footer locale={validLocale} dictionary={dict.footer} />
-          </div>
-        </ThemeProvider>
+    <html lang={locale}>
+      <body className={montserrat.className}>
+        <Providers locale={locale}>
+          <Header dictionary={dict.navigation} locale={locale} />
+          {children}
+          <Footer dictionary={dict.footer} locale={locale} />
+        </Providers>
       </body>
     </html>
   )
