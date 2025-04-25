@@ -12,13 +12,28 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 import { getStaffData } from "@/lib/data/staff"
 import { getValues } from "@/lib/data/values"
 import { i18n } from "@/lib/i18n-config"
+import { Metadata } from "next"
 
-export default async function HomePage({
-  params,
-}: {
-  params: { locale: string }
-}) {
-  const locale = params.locale
+// Define the params type for Next.js 15
+type Props = {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  const dict = await getDictionary(locale)
+  
+  return {
+    title: "Baltzar Tandvård - Advanced Specialist Dental Care",
+    description: dict.home.hero.subtitle,
+  }
+}
+
+export default async function HomePage({ params }: Props) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
   const isValidLocale = i18n.locales.includes(locale)
   const validLocale = isValidLocale ? locale : i18n.defaultLocale
 
