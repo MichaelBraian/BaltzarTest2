@@ -11,9 +11,27 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createRouteHandlerClient({ cookies })
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+      console.error('Auth callback error:', error)
+      // Redirect to login page with error
+      return NextResponse.redirect(
+        new URL('/login?error=auth_callback_failed', request.url)
+      )
+    }
+
+    // Get the user's locale preference or default to 'sv'
+    const locale = session?.user?.user_metadata?.locale || 'sv'
+
+    // Redirect to dashboard with the correct locale
+    return NextResponse.redirect(
+      new URL(`/${locale}/dashboard`, request.url)
+    )
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/dashboard', request.url))
+  // If no code is present, redirect to login
+  return NextResponse.redirect(
+    new URL('/login', request.url)
+  )
 } 
