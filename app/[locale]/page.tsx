@@ -18,19 +18,15 @@ export default async function HomePage({
 }: {
   params: { locale: string }
 }) {
-  // Get the locale from params and validate it
   const locale = params.locale
   const isValidLocale = i18n.locales.includes(locale)
   const validLocale = isValidLocale ? locale : i18n.defaultLocale
 
-  // Get dictionary data
   const dict = await getDictionary(validLocale)
 
-  // Get staff data and values from separate files
   const { doctors, staff } = getStaffData(validLocale)
   const values = getValues(validLocale)
 
-  // Section titles for staff section
   const staffTitles = {
     doctors: validLocale === "sv" ? "Våra Tandläkare" : "Our Dentists",
     doctorsSubtitle:
@@ -54,14 +50,11 @@ export default async function HomePage({
       <Navigation locale={validLocale} />
       <AnimatedBackground />
 
-      {/* 1. Hero Section */}
       <section id="home" className="section min-h-screen">
         <VideoHero dictionary={dict.home.hero} />
       </section>
 
-      {/* Main content area with id for skip link */}
       <main id="main-content">
-        {/* 2. Treatments Section */}
         <section id="treatments" className="section py-20">
           <AnimatedSection animation="fadeIn">
             <div className="container mx-auto">
@@ -70,14 +63,12 @@ export default async function HomePage({
           </AnimatedSection>
         </section>
 
-        {/* 3. Technology Section */}
         <section id="technology" className="section py-20">
           <AnimatedSection animation="slideUp">
             <TechnologySection dictionary={dict.home.technology} locale={validLocale} />
           </AnimatedSection>
         </section>
 
-        {/* 4. Testimonials Section */}
         <section id="testimonials" className="section py-20">
           <AnimatedSection animation="fadeIn">
             <div className="container mx-auto">
@@ -90,7 +81,6 @@ export default async function HomePage({
           </AnimatedSection>
         </section>
 
-        {/* 5. Staff Section */}
         <section id="staff" className="section py-20">
           <div className="container mx-auto">
             <HomeStaffSection 
@@ -103,7 +93,6 @@ export default async function HomePage({
           </div>
         </section>
 
-        {/* 6. Contact Section */}
         <section id="contact" className="section py-20 bg-gray-900">
           <div className="container mx-auto">
             <ContactForm dictionary={dict.contact} locale={validLocale} />
@@ -111,7 +100,6 @@ export default async function HomePage({
         </section>
       </main>
 
-      {/* Scroll to top button */}
       <ScrollToTop />
     </div>
   )

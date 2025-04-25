@@ -5,10 +5,11 @@ import { ContactInfo } from "@/components/contact-info"
 import { ContactMap } from "@/components/contact-map"
 
 export default async function ContactPage({
-  params: { locale },
+  params,
 }: {
   params: { locale: string }
 }) {
+  const locale = params.locale
   // Fetch dictionary data on the server
   const dict = await getDictionary(locale)
 
