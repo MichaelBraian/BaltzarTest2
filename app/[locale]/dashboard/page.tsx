@@ -69,7 +69,12 @@ export default async function DashboardPage({ params }: Props) {
               ? 'Se dina kommande och tidigare bokningar.'
               : 'View your upcoming and past appointments.'}
           </p>
-          <div className="text-yellow-500 text-sm">{locale === 'sv' ? 'Kommer snart' : 'Coming soon'}</div>
+          <Link
+            href={`/${locale}/dashboard/appointments`}
+            className="inline-flex items-center justify-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+          >
+            {locale === 'sv' ? 'Visa bokningar' : 'View Appointments'}
+          </Link>
         </div>
       </div>
       
