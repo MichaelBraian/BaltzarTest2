@@ -13,6 +13,13 @@ export async function middleware(req: NextRequest) {
 
   const pathname = req.nextUrl.pathname
   
+  // If accessing the root domain, redirect to the default locale
+  if (pathname === '/') {
+    return NextResponse.redirect(
+      new URL(`/${i18n.defaultLocale}`, req.url)
+    )
+  }
+
   // Check if the pathname is missing a locale
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
