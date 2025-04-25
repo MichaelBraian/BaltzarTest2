@@ -1,5 +1,8 @@
 import { createServerClient } from '@/lib/supabase/server'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = createServerClient()
 
@@ -7,21 +10,32 @@ export default async function DashboardPage() {
     data: { session },
   } = await supabase.auth.getSession()
 
-  const { data: appointments } = await supabase
+  // Handle case where session might be null
+  if (!session) {
+    return <div>Loading dashboard or please log in...</div>;
+  }
+
+  const { data: appointments, error } = await supabase
     .from('appointments')
     .select('*')
-    .eq('patient_id', session?.user.id)
+    .eq('patient_id', session.user.id) // Use session.user.id directly
     .order('start_time', { ascending: true })
     .limit(5)
 
+  if (error) {
+    console.error("Error fetching appointments for dashboard:", error);
+    // Render dashboard without appointments or show an error
+  }
+
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Welcome, {session?.user.email}</h1>
+      <h1 className="text-3xl font-bold">Welcome, {session.user.email}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
-          {appointments && appointments.length > 0 ? (
+          {error && <p className="text-red-600">Could not load appointments.</p>}
+          {!error && appointments && appointments.length > 0 ? (
             <ul className="space-y-4">
               {appointments.map((appointment) => (
                 <li
@@ -42,7 +56,7 @@ export default async function DashboardPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-600">No upcoming appointments</p>
+            !error && <p className="text-gray-600">No upcoming appointments</p>
           )}
         </div>
 
