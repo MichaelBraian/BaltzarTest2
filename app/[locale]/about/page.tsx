@@ -10,7 +10,7 @@ import { Metadata } from "next"
 // Define the params type for Next.js 15
 type Props = {
   params: Promise<{ locale: string }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(
