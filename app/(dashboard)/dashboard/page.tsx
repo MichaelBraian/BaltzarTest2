@@ -50,13 +50,13 @@ export default async function DashboardPage() {
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="space-y-4">
             <a
-              href="/dashboard/appointments/new"
+              href="./dashboard/appointments/new"
               className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
               Book New Appointment
             </a>
             <a
-              href="/dashboard/profile"
+              href="./dashboard/profile"
               className="block w-full text-center bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700"
             >
               Update Profile

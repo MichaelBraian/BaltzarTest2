@@ -14,9 +14,10 @@ interface AppointmentType {
 interface BookingFormProps {
   appointmentTypes: AppointmentType[]
   patientId?: string
+  returnPath?: string
 }
 
-export function BookingForm({ appointmentTypes, patientId }: BookingFormProps) {
+export function BookingForm({ appointmentTypes, patientId, returnPath = '/dashboard/appointments' }: BookingFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +54,7 @@ export function BookingForm({ appointmentTypes, patientId }: BookingFormProps) {
 
       if (insertError) throw insertError
 
-      router.push('/dashboard/appointments')
+      router.push(returnPath)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to book appointment')
     } finally {

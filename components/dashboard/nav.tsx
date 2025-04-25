@@ -18,19 +18,19 @@ export function DashboardNav() {
       <div className="space-y-4">
         <div className="text-xl font-bold mb-8">Patient Portal</div>
         <Link
-          href="/dashboard"
+          href="../dashboard"
           className="block py-2 px-4 rounded hover:bg-gray-700"
         >
           Dashboard
         </Link>
         <Link
-          href="/dashboard/appointments"
+          href="../dashboard/appointments"
           className="block py-2 px-4 rounded hover:bg-gray-700"
         >
           Appointments
         </Link>
         <Link
-          href="/dashboard/profile"
+          href="../dashboard/profile"
           className="block py-2 px-4 rounded hover:bg-gray-700"
         >
           Profile

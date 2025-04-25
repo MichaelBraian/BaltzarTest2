@@ -22,6 +22,7 @@ export default async function NewAppointmentPage() {
         <BookingForm
           patientId={session?.user.id}
           appointmentTypes={appointmentTypes || []}
+          returnPath="../appointments"
         />
       </div>
     </div>

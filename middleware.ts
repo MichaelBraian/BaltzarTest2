@@ -15,9 +15,9 @@ export async function middleware(req: NextRequest) {
   
   // If accessing the root domain, redirect to the default locale
   if (pathname === '/') {
-    return NextResponse.redirect(
-      new URL(`/${i18n.defaultLocale}`, req.url)
-    )
+    const url = req.nextUrl.clone()
+    url.pathname = `/${i18n.defaultLocale}`
+    return NextResponse.redirect(url)
   }
 
   // Check if the pathname is missing a locale
@@ -28,9 +28,9 @@ export async function middleware(req: NextRequest) {
   // If it's missing a locale, redirect to the default locale
   if (pathnameIsMissingLocale) {
     const locale = i18n.defaultLocale
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`, req.url),
-    )
+    const url = req.nextUrl.clone()
+    url.pathname = `/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`
+    return NextResponse.redirect(url)
   }
 
   // Define public paths that don't require authentication
@@ -67,7 +67,9 @@ export async function middleware(req: NextRequest) {
   if (!session && !isPublicPath) {
     // Get the current locale from the pathname
     const currentLocale = pathname.split('/')[1]
-    return NextResponse.redirect(new URL(`/${currentLocale}/login`, req.url))
+    const url = req.nextUrl.clone()
+    url.pathname = `/${currentLocale}/login`
+    return NextResponse.redirect(url)
   }
 
   // If user is signed in and the current path is /login or /register,
@@ -82,7 +84,9 @@ export async function middleware(req: NextRequest) {
   )) {
     // Get the current locale from the pathname
     const currentLocale = pathname.split('/')[1]
-    return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, req.url))
+    const url = req.nextUrl.clone()
+    url.pathname = `/${currentLocale}/dashboard`
+    return NextResponse.redirect(url)
   }
 
   return res

@@ -19,7 +19,7 @@ export default async function AppointmentsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">My Appointments</h1>
         <a
-          href="/dashboard/appointments/new"
+          href="./appointments/new"
           className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
         >
           Book New Appointment
@@ -75,14 +75,14 @@ export default async function AppointmentsPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <a
-                    href={`/dashboard/appointments/${appointment.id}`}
+                    href={`./appointments/${appointment.id}`}
                     className="text-blue-600 hover:text-blue-900 mr-4"
                   >
                     View
                   </a>
                   {appointment.status === 'confirmed' && (
                     <a
-                      href={`/dashboard/appointments/${appointment.id}/cancel`}
+                      href={`./appointments/${appointment.id}/cancel`}
                       className="text-red-600 hover:text-red-900"
                     >
                       Cancel
