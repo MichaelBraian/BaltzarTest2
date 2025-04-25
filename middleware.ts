@@ -9,16 +9,13 @@ const PUBLIC_FILE = /\.(.*)$/;
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  // 1. Check if the path is for a public file (asset) or API route
-  // Skip middleware processing for these paths
+  // 1. Skip middleware for public files, API routes, and Next.js internals
   if (
     pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') || // _next/static, _next/image, etc.
-    PUBLIC_FILE.test(pathname) || // Matches files with extensions (e.g., .ico, .png)
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml'
+    pathname.startsWith('/_next') || // Match all _next paths
+    pathname.includes('.') // More robust check for file extensions
   ) {
-    return NextResponse.next() // Let the request proceed without modification
+    return NextResponse.next(); // Skip middleware processing
   }
 
   // --- The rest of your existing middleware logic --- 
@@ -44,7 +41,7 @@ export async function middleware(req: NextRequest) {
   if (pathnameIsMissingLocale) {
     const locale = i18n.defaultLocale
     const url = req.nextUrl.clone()
-    url.pathname = `/${locale}${pathname}` // Simplification: pathname already includes leading /
+    url.pathname = `/${locale}${pathname}` 
     return NextResponse.redirect(url)
   }
 
@@ -107,17 +104,13 @@ export async function middleware(req: NextRequest) {
   return res
 }
 
-// Update matcher to be simpler - let the function logic handle exclusions
+// Use a very broad matcher and rely on the function logic for exclusion
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * --- Let the function handle these exclusions explicitly ---
+     * Match all paths except for static assets directly under /public
+     * The function itself handles API, _next, and specific file exclusions.
      */
-    '/((?!_next/static|_next/image|assets|favicon.ico|sw.js).*)',
+    '/((?!public/).*)', // Matches everything except paths starting with /public/
   ],
-}
+};
