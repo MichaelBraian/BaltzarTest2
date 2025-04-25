@@ -2,11 +2,11 @@ import { Metadata } from 'next'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import RegisterForm from './RegisterForm'
+import RegistrationForm from './RegistrationForm'
 
 export const metadata: Metadata = {
   title: 'Register | Baltzar Tandvård',
-  description: 'Create your Baltzar Tandvård account',
+  description: 'Register for a Baltzar Tandvård account',
 }
 
 // Define the params type for Next.js 15
@@ -15,9 +15,13 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default async function RegisterPage({ params }: Props) {
+export default async function RegisterPage({ params, searchParams }: Props) {
   const resolvedParams = await params
   const locale = resolvedParams.locale
+  
+  const resolvedSearchParams = await searchParams
+  const email = resolvedSearchParams.email as string || ''
+  const verified = resolvedSearchParams.verified === 'true'
   
   const supabase = createServerComponentClient({ cookies })
   
@@ -34,10 +38,15 @@ export default async function RegisterPage({ params }: Props) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            {locale === 'sv' ? 'Skapa konto' : 'Create your account'}
+            {locale === 'sv' ? 'Skapa ett konto' : 'Create an account'}
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-400">
+            {locale === 'sv' 
+              ? 'Registrera dig för att få tillgång till din patientportal' 
+              : 'Register to access your patient portal'}
+          </p>
         </div>
-        <RegisterForm locale={locale} />
+        <RegistrationForm locale={locale} prefilledEmail={email} verified={verified} />
       </div>
     </div>
   )
