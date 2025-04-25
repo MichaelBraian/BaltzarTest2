@@ -26,18 +26,19 @@ export function AnimatedBackground() {
 
     // Particle class
     class Particle {
-      x: number
-      y: number
-      size: number
-      baseSize: number
-      speedX: number
-      speedY: number
-      color: string
-      pulseDirection: boolean
-      pulseSpeed: number
-      opacity: number
+      x: number = 0
+      y: number = 0
+      size: number = 0
+      baseSize: number = 0
+      speedX: number = 0
+      speedY: number = 0
+      color: string = ""
+      pulseDirection: boolean = false
+      pulseSpeed: number = 0
+      opacity: number = 0
 
       constructor() {
+        if (!canvas) return // This should never happen, but satisfies TypeScript
         this.x = Math.random() * canvas.width
         this.y = Math.random() * canvas.height
         this.baseSize = Math.random() * 5 + 2 // Increased base size
@@ -55,6 +56,7 @@ export function AnimatedBackground() {
       }
 
       update() {
+        if (!canvas) return // Safety check
         this.x += this.speedX
         this.y += this.speedY
 
@@ -75,6 +77,7 @@ export function AnimatedBackground() {
       }
 
       draw() {
+        if (!ctx) return // Safety check
         ctx.fillStyle = this.color
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
@@ -89,6 +92,7 @@ export function AnimatedBackground() {
 
     // Animation loop
     const animate = () => {
+      if (!canvas || !ctx) return // Safety check
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       for (const particle of particles) {
