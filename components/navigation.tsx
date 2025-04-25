@@ -4,22 +4,38 @@ import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { LanguageSwitcher } from "@/components/language-switcher"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogIn } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 interface MenuItem {
   id: string
   name: string
+  href?: string
+  isExternal?: boolean
 }
 
 export function Navigation({ locale }: { locale?: string }) {
   const [activeSection, setActiveSection] = useState<string>("home")
   const [scrolled, setScrolled] = useState<boolean>(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
 
   // Default to 'en' if locale is not provided
   const currentLocale = locale || "en"
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient()
+      const { data } = await supabase.auth.getSession()
+      setIsLoggedIn(!!data.session)
+    }
+    
+    checkSession()
+  }, [])
 
   // Define menu items with correct section IDs
   const menuItems: MenuItem[] = [
@@ -48,93 +64,64 @@ export function Navigation({ locale }: { locale?: string }) {
   // Function to handle smooth scrolling to sections
   const scrollToSection = useCallback((sectionId: string) => {
     const section = document.getElementById(sectionId)
-
     if (section) {
-      // Close mobile menu if open
-      setMobileMenuOpen(false)
-
-      // Get the header height for offset
-      const headerHeight = 80
-
-      // Calculate position accounting for header
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY
-      const offsetPosition = sectionPosition - headerHeight
-
-      // Smooth scroll to section
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      })
-
-      // Update active section
+      section.scrollIntoView({ behavior: "smooth" })
       setActiveSection(sectionId)
     }
   }, [])
 
-  // Handle click on menu items
+  // Function to handle menu item clicks
   const handleMenuClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault()
     scrollToSection(sectionId)
+    setMobileMenuOpen(false)
   }
 
-  // Add keyboard navigation for menu items
+  // Function to handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent, sectionId: string) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
       scrollToSection(sectionId)
+      setMobileMenuOpen(false)
     }
   }
 
-  // Track scroll position and update active section using IntersectionObserver
+  // Update active section based on scroll position
   useEffect(() => {
-    // Update header style based on scroll position
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
+      // Check if page has scrolled
+      if (window.scrollY > 50) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+
+      // Update active section based on scroll position
+      const sections = menuItems.map((item) => document.getElementById(item.id))
+      const scrollPosition = window.scrollY + 100 // Offset for header height
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i]
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(menuItems[i].id)
+          break
+        }
+      }
     }
 
     window.addEventListener("scroll", handleScroll)
-
-    // Use IntersectionObserver to detect which section is in view
-    const observerOptions = {
-      root: null,
-      rootMargin: "-80px 0px -20% 0px", // Adjust rootMargin to account for header and give some threshold
-      threshold: 0.2, // Section is considered in view when 20% is visible
-    }
-
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.getAttribute("id") || ""
-          if (sectionId) {
-            setActiveSection(sectionId)
-          }
-        }
-      })
-    }, observerOptions)
-
-    // Observe all sections
-    const sections = document.querySelectorAll("section[id]")
-    sections.forEach((section) => {
-      sectionObserver.observe(section)
-    })
-
-    // Initial call to set header style
-    handleScroll()
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      sections.forEach((section) => {
-        sectionObserver.unobserve(section)
-      })
-    }
-  }, [])
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [menuItems])
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
-      if (mobileMenuOpen && !target.closest(".mobile-menu") && !target.closest(".mobile-menu-button")) {
+      if (
+        mobileMenuOpen &&
+        !target.closest(".mobile-menu") &&
+        !target.closest(".mobile-menu-button")
+      ) {
         setMobileMenuOpen(false)
       }
     }
@@ -143,7 +130,7 @@ export function Navigation({ locale }: { locale?: string }) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [mobileMenuOpen])
 
-  // Prevent body scroll when mobile menu is open
+  // Prevent scrolling when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden"
@@ -204,6 +191,24 @@ export function Navigation({ locale }: { locale?: string }) {
 
         {/* Right side items */}
         <div className="flex items-center gap-4">
+          {/* Login/Logout Button */}
+          {isLoggedIn ? (
+            <Link 
+              href="/dashboard" 
+              className="flex items-center gap-1 rounded-md bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+            >
+              {currentLocale === "sv" ? "Dashboard" : "Dashboard"}
+            </Link>
+          ) : (
+            <Link 
+              href="/login" 
+              className="flex items-center gap-1 rounded-md border border-orange-500 px-3 py-1.5 text-sm font-medium text-orange-500 transition-colors hover:bg-orange-500 hover:text-white"
+            >
+              <LogIn size={16} />
+              {currentLocale === "sv" ? "Logga in" : "Log in"}
+            </Link>
+          )}
+
           {/* Language Switcher */}
           <LanguageSwitcher locale={currentLocale} />
 
@@ -248,6 +253,25 @@ export function Navigation({ locale }: { locale?: string }) {
                 </a>
               </li>
             ))}
+            <li>
+              {isLoggedIn ? (
+                <Link 
+                  href="/dashboard" 
+                  className="block text-xl font-medium text-orange-500 transition-colors hover:text-orange-400"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {currentLocale === "sv" ? "Dashboard" : "Dashboard"}
+                </Link>
+              ) : (
+                <Link 
+                  href="/login" 
+                  className="block text-xl font-medium text-white transition-colors hover:text-orange-500"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {currentLocale === "sv" ? "Logga in" : "Log in"}
+                </Link>
+              )}
+            </li>
           </ul>
         </nav>
       </div>

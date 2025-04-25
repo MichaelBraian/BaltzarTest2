@@ -11,9 +11,28 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // If user is not signed in and the current path is not /login, /register, /, or /auth/callback,
+  // Define public paths that don't require authentication
+  const publicPaths = [
+    '/', 
+    '/login', 
+    '/register', 
+    '/auth/callback',
+    '/about',
+    '/services',
+    '/contact',
+    '/privacy-policy',
+    '/terms-of-service'
+  ]
+
+  // Check if the current path is a public path
+  const isPublicPath = publicPaths.some(path => 
+    req.nextUrl.pathname === path || 
+    req.nextUrl.pathname.startsWith(`${path}/`)
+  )
+
+  // If user is not signed in and the current path is not a public path,
   // redirect the user to /login
-  if (!session && !['/login', '/register', '/', '/auth/callback'].includes(req.nextUrl.pathname)) {
+  if (!session && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
