@@ -10,16 +10,6 @@ const nextConfig = {
       bodySizeLimit: '2mb'
     }
   },
-  trailingSlash: true,
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/sv',
-        permanent: true,
-      },
-    ];
-  },
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
