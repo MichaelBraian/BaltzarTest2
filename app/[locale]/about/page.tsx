@@ -7,12 +7,17 @@ import { AboutValues } from "@/components/about-values"
 import { AboutContact } from "@/components/about-contact"
 import { Metadata } from "next"
 
-type Props = {
-  params: { locale: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+// Define the params type
+type Params = {
+  locale: string
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// Define the searchParams type
+type SearchParams = {
+  [key: string]: string | string[] | undefined
+}
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const locale = params.locale
   const dict = await getDictionary(locale)
   
@@ -22,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function AboutPage({ params }: Props) {
+export default function AboutPage({ params }: { params: Params }) {
   const locale = params.locale
 
   return (
