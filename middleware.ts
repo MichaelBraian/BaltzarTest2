@@ -24,26 +24,8 @@ export async function middleware(req: NextRequest) {
     '/terms-of-service'
   ]
 
-  // Check if the current path is a public path
-  const isPublicPath = publicPaths.some(path => 
-    req.nextUrl.pathname === path || 
-    req.nextUrl.pathname.startsWith(`${path}/`)
-  )
-
-  // If user is not signed in and the current path is not a public path,
-  // redirect the user to /login
-  if (!session && !isPublicPath) {
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
-
-  // If user is signed in and the current path is /login or /register,
-  // redirect the user to /dashboard
-  if (session && ['/login', '/register'].includes(req.nextUrl.pathname)) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
-
   const pathname = req.nextUrl.pathname
-
+  
   // Check if the pathname is missing a locale
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
@@ -58,6 +40,40 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(
       new URL(`/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`, req.url),
     )
+  }
+
+  // Check if the current path is a public path
+  const isPublicPath = publicPaths.some(path => 
+    pathname === path || 
+    pathname.startsWith(`${path}/`) ||
+    // Also check for localized paths
+    i18n.locales.some(locale => 
+      pathname === `/${locale}${path}` || 
+      pathname.startsWith(`/${locale}${path}/`)
+    )
+  )
+
+  // If user is not signed in and the current path is not a public path,
+  // redirect the user to /login
+  if (!session && !isPublicPath) {
+    // Get the current locale from the pathname
+    const currentLocale = pathname.split('/')[1]
+    return NextResponse.redirect(new URL(`/${currentLocale}/login`, req.url))
+  }
+
+  // If user is signed in and the current path is /login or /register,
+  // redirect the user to /dashboard
+  if (session && (
+    pathname.endsWith('/login') || 
+    pathname.endsWith('/register') ||
+    i18n.locales.some(locale => 
+      pathname === `/${locale}/login` || 
+      pathname === `/${locale}/register`
+    )
+  )) {
+    // Get the current locale from the pathname
+    const currentLocale = pathname.split('/')[1]
+    return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, req.url))
   }
 
   return res
