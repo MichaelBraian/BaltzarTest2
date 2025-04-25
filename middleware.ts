@@ -9,12 +9,15 @@ const PUBLIC_FILE = /\.(.*)$/;
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  // 1. Skip middleware for public files, API routes, and Next.js internals
+  // 1. Skip middleware for public files, API routes, Next.js internals, and auth callback
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next') || // Match all _next paths
+    pathname === '/auth/callback' || // Exact match for auth callback
+    pathname.startsWith('/auth/callback/') || // Also match with trailing paths
     pathname.includes('.') // More robust check for file extensions
   ) {
+    console.log(`[Middleware] Skipping middleware for path: ${pathname}`);
     return NextResponse.next(); // Skip middleware processing
   }
 
@@ -50,7 +53,7 @@ export async function middleware(req: NextRequest) {
     '/', 
     '/login', 
     '/register', 
-    '/auth/callback',
+    '/auth/callback', // Keep this for compatibility
     '/about',
     '/services',
     '/contact',
@@ -104,13 +107,17 @@ export async function middleware(req: NextRequest) {
   return res
 }
 
-// Use a very broad matcher and rely on the function logic for exclusion
+// Use a matcher that explicitly excludes auth callback paths
 export const config = {
   matcher: [
     /*
-     * Match all paths except for static assets directly under /public
-     * The function itself handles API, _next, and specific file exclusions.
+     * Match all request paths except for the ones starting with:
+     * - auth/callback (auth callback path)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
      */
-    '/((?!public/).*)', // Matches everything except paths starting with /public/
+    '/((?!auth/callback|_next/static|_next/image|favicon.ico|public/).+)',
   ],
 };

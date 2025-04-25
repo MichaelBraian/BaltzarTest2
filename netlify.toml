@@ -41,6 +41,20 @@
 [build.processing.images]
   compress = true
 
+# Special redirect for the auth callback route
+[[redirects]]
+  from = "/auth/callback"
+  to = "/.netlify/functions/next_auth_callback"
+  status = 200
+  force = true
+
+# Specific redirect rules for auth callback with query parameters
+[[redirects]]
+  from = "/auth/callback/*"
+  to = "/.netlify/functions/next_auth_callback/:splat"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/static/*"
   [headers.values]
