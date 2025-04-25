@@ -8,14 +8,14 @@ import { AboutContact } from "@/components/about-contact"
 import { Metadata } from "next"
 
 // Define the params type for Next.js 15
-type PageProps = {
-  params: {
-    locale: string
-  }
-  searchParams?: { [key: string]: string | string[] | undefined }
+type Props = {
+  params: { locale: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
   const locale = params.locale
   const dict = await getDictionary(locale)
   
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function AboutPage({ params }: PageProps) {
+export default async function AboutPage({ params }: Props) {
   const locale = params.locale
   const dict = await getDictionary(locale)
 
