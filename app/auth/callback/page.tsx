@@ -3,44 +3,89 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-// Separate component that uses useSearchParams to handle auth logic
+// Separate component that handles auth logic
 function AuthCallbackHandler() {
   const [message, setMessage] = useState<string>('Processing authentication...')
   const router = useRouter()
+  const supabase = createClientComponentClient()
   
-  // This will be replaced with client-side redirection at runtime
   useEffect(() => {
-    // We can't use useSearchParams directly here, but we can use window.location
+    // Parse URL
     const url = new URL(window.location.href)
     const code = url.searchParams.get('code')
     const error = url.searchParams.get('error')
     const errorCode = url.searchParams.get('error_code')
     const errorDescription = url.searchParams.get('error_description')
     
-    // If there's a code or error, redirect to the API route to handle it properly
-    if (code || error || errorCode) {
-      console.log('Detected auth parameters, redirecting to API handler')
-      window.location.href = `/api/auth/callback${window.location.search}${window.location.hash || ''}`
-      return
+    async function handleAuthCallback() {
+      // Handle error cases first
+      if (error || errorCode === 'otp_expired') {
+        console.log('Auth error detected:', { error, errorCode, errorDescription })
+        
+        if (errorCode === 'otp_expired') {
+          setMessage('Your magic link has expired. Redirecting to login page...')
+        } else if (errorDescription) {
+          setMessage(`${errorDescription}. Redirecting to login page...`)
+        } else {
+          setMessage('Authentication failed. Redirecting to login page...')
+        }
+        
+        setTimeout(() => {
+          router.push('/sv/login')
+        }, 2000)
+        return
+      }
+      
+      // Handle auth code
+      if (code) {
+        try {
+          setMessage('Authenticating your session...')
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+          
+          if (error) {
+            console.error('Error exchanging code for session:', error)
+            setMessage(`Authentication failed: ${error.message}. Redirecting...`)
+            setTimeout(() => {
+              router.push('/sv/login')
+            }, 2000)
+            return
+          }
+          
+          if (data.session) {
+            setMessage('Authentication successful! Redirecting...')
+            // Get user locale preference or default to 'sv'
+            const locale = data.session.user?.user_metadata?.locale || 'sv'
+            setTimeout(() => {
+              router.push(`/${locale}/dashboard`)
+            }, 1000)
+          } else {
+            setMessage('No session created. Redirecting to login...')
+            setTimeout(() => {
+              router.push('/sv/login')
+            }, 2000)
+          }
+        } catch (err) {
+          console.error('Unexpected error processing auth code:', err)
+          setMessage('An unexpected error occurred. Redirecting to login...')
+          setTimeout(() => {
+            router.push('/sv/login')
+          }, 2000)
+        }
+        return
+      }
+      
+      // Default case - no code or error
+      setMessage('No authentication data found. Redirecting to login...')
+      setTimeout(() => {
+        router.push('/sv/login')
+      }, 2000)
     }
-
-    // If no auth parameters, handle direct visits to page
-    if (error === 'access_denied' || errorCode === 'otp_expired') {
-      setMessage('Your magic link has expired. Redirecting to login page...')
-    } else if (errorDescription) {
-      setMessage(`${errorDescription}. Redirecting to login page...`)
-    } else {
-      setMessage('Authentication failed. Redirecting to login page...')
-    }
-
-    // Redirect to login after a delay
-    const timer = setTimeout(() => {
-      router.push('/sv/login')
-    }, 2000)
-
-    return () => clearTimeout(timer)
-  }, [router])
+    
+    // Execute the auth logic
+    handleAuthCallback()
+  }, [router, supabase])
 
   return (
     <p className="text-gray-600 dark:text-gray-300">{message}</p>

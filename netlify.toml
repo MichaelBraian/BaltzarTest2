@@ -41,21 +41,14 @@
 [build.processing.images]
   compress = true
 
-# Auth callback should be handled by both path patterns
+# Make sure auth callback pages are handled correctly
 [[redirects]]
   from = "/auth/callback"
-  to = "/api/auth/callback"
+  to = "/auth/callback"
   status = 200
   force = true
 
-# Handle auth callback with any query parameters
-[[redirects]]
-  from = "/auth/callback*"
-  to = "/api/auth/callback:splat"
-  status = 200
-  force = true
-
-# Catch-all rule for SPA routing
+# Catch-all SPA route
 [[redirects]]
   from = "/*"
   to = "/index.html"

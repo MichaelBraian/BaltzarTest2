@@ -3,42 +3,45 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { i18n } from "./lib/i18n-config"
 
-// List of paths to explicitly ignore in the middleware
-const PUBLIC_FILE = /\.(.*)$/;
+// Paths that should bypass middleware
+const BYPASS_PATHS = [
+  '/api/',             // API routes
+  '/_next',            // Next.js internals
+  '/auth/callback',    // Auth callback
+  '/favicon.ico',      // Favicon
+  '/robots.txt',       // Robots.txt
+  '/sitemap.xml',      // Sitemap
+  '/public/'           // Public files
+]
 
 export async function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname
-
-  // 1. Skip middleware for public files, API routes, Next.js internals, and auth callback
-  if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next') || // Match all _next paths
-    pathname === '/auth/callback' || // Exact match for auth callback
-    pathname.startsWith('/auth/callback/') || // Also match with trailing paths
-    pathname.includes('.') // More robust check for file extensions
-  ) {
-    console.log(`[Middleware] Skipping middleware for path: ${pathname}`);
-    return NextResponse.next(); // Skip middleware processing
+  const { pathname } = req.nextUrl
+  
+  // Check if the current path should bypass middleware
+  const shouldBypass = BYPASS_PATHS.some(path => 
+    pathname.startsWith(path) || pathname.includes('.')
+  )
+  
+  if (shouldBypass) {
+    console.log(`[Middleware] Bypassing middleware for path: ${pathname}`)
+    return NextResponse.next()
   }
 
-  // --- The rest of your existing middleware logic --- 
+  // Initialize the Supabase client
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const { data: { session } } = await supabase.auth.getSession()
   
-  // 2. Handle root path redirect to default locale
+  // Handle root path redirect to default locale
   if (pathname === '/') {
     const url = req.nextUrl.clone()
     url.pathname = `/${i18n.defaultLocale}`
     return NextResponse.redirect(url)
   }
 
-  // 3. Handle missing locale prefix
+  // Handle missing locale prefix
   const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    locale => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   )
 
   if (pathnameIsMissingLocale) {
@@ -53,7 +56,6 @@ export async function middleware(req: NextRequest) {
     '/', 
     '/login', 
     '/register', 
-    '/auth/callback', // Keep this for compatibility
     '/about',
     '/services',
     '/contact',
@@ -107,18 +109,15 @@ export async function middleware(req: NextRequest) {
   return res
 }
 
-// Use a matcher that explicitly excludes auth callback paths
+// Use a matcher that applies middleware to all routes except specific paths
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth/callback (new auth callback API path)
-     * - auth/callback (legacy path)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * Match all paths except:
+     * - static files, images, etc
+     * - api routes
+     * - auth callback paths
      */
-    '/((?!api/auth/callback|auth/callback|_next/static|_next/image|favicon.ico|public/).+)',
+    '/((?!_next/static|_next/image|api/|auth/callback|favicon.ico).+)',
   ],
 };
