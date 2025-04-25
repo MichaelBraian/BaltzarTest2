@@ -1,7 +1,7 @@
-import "./globals.css"
-import { Providers } from "@/components/providers"
+import "@/app/globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 import { getDictionary } from "@/lib/dictionaries"
-import { Header } from "@/components/header"
+import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { Montserrat } from "next/font/google"
 import type { Metadata } from "next"
@@ -28,11 +28,13 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale}>
       <body className={montserrat.className}>
-        <Providers locale={locale}>
-          <Header dictionary={dict.navigation} locale={locale} />
-          {children}
-          <Footer dictionary={dict.footer} locale={locale} />
-        </Providers>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <div className="min-h-screen flex flex-col mx-auto max-w-screen-2xl w-full">
+            <Navigation locale={locale} />
+            <main>{children}</main>
+            <Footer dictionary={dict.footer} locale={locale} />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
