@@ -6,14 +6,12 @@ import { AboutHistory } from "@/components/about-history"
 import { AboutValues } from "@/components/about-values"
 import { AboutContact } from "@/components/about-contact"
 
-interface PageProps {
-  params: {
-    locale: string
-  }
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
-
-export default async function AboutPage({ params: { locale } }: PageProps) {
+export default async function AboutPage({
+  params,
+}: {
+  params: { locale: string }
+}) {
+  const locale = params.locale
   const dict = await getDictionary(locale)
 
   return (
