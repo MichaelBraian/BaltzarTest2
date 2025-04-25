@@ -41,19 +41,25 @@
 [build.processing.images]
   compress = true
 
-# Special redirect for the auth callback route
+# Auth callback must be handled by the Next.js app router
 [[redirects]]
   from = "/auth/callback"
-  to = "/.netlify/functions/next_auth_callback"
+  to = "/auth/callback"
   status = 200
   force = true
 
-# Specific redirect rules for auth callback with query parameters
+# Handle auth callback with any query parameters
 [[redirects]]
-  from = "/auth/callback/*"
-  to = "/.netlify/functions/next_auth_callback/:splat"
+  from = "/auth/callback*"
+  to = "/auth/callback:splat"
   status = 200
   force = true
+
+# Catch-all rule for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/static/*"

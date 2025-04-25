@@ -11,18 +11,36 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const error = requestUrl.searchParams.get('error')
+  const errorCode = requestUrl.searchParams.get('error_code')
   const errorDescription = requestUrl.searchParams.get('error_description')
+  
+  // Debug all parameters
+  console.log('[Auth Callback] Request parameters:', {
+    code,
+    error,
+    errorCode,
+    errorDescription,
+    hash: requestUrl.hash,
+    fullUrl: request.url
+  });
   
   // Get base URL from environment or fallback to current origin
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin
+  console.log('[Auth Callback] Using base URL:', baseUrl);
 
-  // Handle error cases from Supabase auth
-  if (error) {
-    console.log(`[Auth Callback] Received error: ${error}, description: ${errorDescription}`);
-    // Redirect to login page with error
-    return NextResponse.redirect(
-      `${baseUrl}/sv/login?error=${error}&error_description=${encodeURIComponent(errorDescription || '')}`
-    )
+  // Handle error cases from Supabase auth, including expired OTPs
+  if (error || errorCode === 'otp_expired') {
+    console.log(`[Auth Callback] Received error: ${error}, code: ${errorCode}, description: ${errorDescription}`);
+    
+    // For expired OTP specifically provide a better message
+    const redirectUrl = `${baseUrl}/sv/login?error=${error || 'access_denied'}&error_description=${
+      errorCode === 'otp_expired' 
+        ? encodeURIComponent('Your magic link has expired. Please request a new one.') 
+        : encodeURIComponent(errorDescription || 'Authentication failed')
+    }`;
+    
+    console.log(`[Auth Callback] Redirecting to: ${redirectUrl}`);
+    return NextResponse.redirect(redirectUrl);
   }
 
   if (code) {
@@ -34,16 +52,16 @@ export async function GET(request: Request) {
       if (error) {
         console.log('[Auth Callback] Error exchanging code for session:', error);
         // Redirect to login page with error
-        return NextResponse.redirect(
-          `${baseUrl}/sv/login?error=auth_exchange_failed&error_description=${encodeURIComponent(error.message)}`
-        )
+        const redirectUrl = `${baseUrl}/sv/login?error=auth_exchange_failed&error_description=${encodeURIComponent(error.message)}`;
+        console.log(`[Auth Callback] Redirecting to: ${redirectUrl}`);
+        return NextResponse.redirect(redirectUrl);
       }
 
       if (!session) {
         console.log('[Auth Callback] No session received after code exchange');
-        return NextResponse.redirect(
-          `${baseUrl}/sv/login?error=no_session`
-        )
+        const redirectUrl = `${baseUrl}/sv/login?error=no_session`;
+        console.log(`[Auth Callback] Redirecting to: ${redirectUrl}`);
+        return NextResponse.redirect(redirectUrl);
       }
 
       console.log('[Auth Callback] Session created successfully for user:', session.user.id);
@@ -55,18 +73,18 @@ export async function GET(request: Request) {
       // Redirect to dashboard with the correct locale
       const dashboardUrl = `${baseUrl}/${locale}/dashboard`;
       console.log(`[Auth Callback] Redirecting to: ${dashboardUrl}`);
-      return NextResponse.redirect(dashboardUrl)
+      return NextResponse.redirect(dashboardUrl);
     } catch (err) {
       console.log('[Auth Callback] Unexpected error processing auth code:', err);
-      return NextResponse.redirect(
-        `${baseUrl}/sv/login?error=unexpected_error`
-      )
+      const redirectUrl = `${baseUrl}/sv/login?error=unexpected_error`;
+      console.log(`[Auth Callback] Redirecting to: ${redirectUrl}`);
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
   console.log('[Auth Callback] No auth code found in request, redirecting to login');
   // If no code is present, redirect to login
-  return NextResponse.redirect(
-    `${baseUrl}/sv/login`
-  )
+  const redirectUrl = `${baseUrl}/sv/login`;
+  console.log(`[Auth Callback] Redirecting to: ${redirectUrl}`);
+  return NextResponse.redirect(redirectUrl);
 } 
