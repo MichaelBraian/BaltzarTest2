@@ -7,17 +7,15 @@ import { AboutValues } from "@/components/about-values"
 import { AboutContact } from "@/components/about-contact"
 import { Metadata } from "next"
 
-// Define the params type
-type Params = {
-  locale: string
+// Define the params type for Next.js 15
+type PageProps = {
+  params: {
+    locale: string
+  }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
-// Define the searchParams type
-type SearchParams = {
-  [key: string]: string | string[] | undefined
-}
-
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = params.locale
   const dict = await getDictionary(locale)
   
@@ -27,17 +25,18 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default function AboutPage({ params }: { params: Params }) {
+export default async function AboutPage({ params }: PageProps) {
   const locale = params.locale
+  const dict = await getDictionary(locale)
 
   return (
-    <div>
+    <main className="flex min-h-screen flex-col items-center justify-between">
       <AboutHero locale={locale} />
       <AboutMission locale={locale} />
       <AboutHistory locale={locale} />
       <AboutDigitalDentistry locale={locale} />
       <AboutValues locale={locale} />
       <AboutContact locale={locale} />
-    </div>
+    </main>
   )
 }
