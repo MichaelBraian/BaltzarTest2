@@ -15,6 +15,10 @@ export default function RegisterForm({ locale }: RegisterFormProps) {
   const [verificationSent, setVerificationSent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  
+  // Get site URL for redirection - this is the critical fix
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://baltzartandvardcursor.netlify.app'
+  console.log("[Register] Using site URL for redirect:", siteUrl)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -45,11 +49,11 @@ export default function RegisterForm({ locale }: RegisterFormProps) {
         throw new Error(verifyData.error || 'Verification failed')
       }
 
-      // If patient exists, send magic link
+      // If patient exists, send magic link - use the correct site URL
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${siteUrl}/auth/callback`,
           data: {
             patientId: verifyData.patientId,
             locale: locale,

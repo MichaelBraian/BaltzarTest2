@@ -8,6 +8,10 @@ export async function POST(request: Request) {
     const { email, password } = await request.json()
     const supabase = createRouteHandlerClient({ cookies })
 
+    // Get site URL with fallback
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://baltzartandvardcursor.netlify.app'
+    console.log("[API Registration] Using site URL for redirect:", siteUrl)
+
     // First, verify if the patient exists in your existing system
     const verificationResult = await patientService.verifyPatient(email)
 
@@ -44,7 +48,7 @@ export async function POST(request: Request) {
         email,
         password,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+          emailRedirectTo: `${siteUrl}/auth/callback`,
         },
       })
 
