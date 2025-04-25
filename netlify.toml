@@ -3,14 +3,11 @@
   publish = ".next"
 
 [build.environment]
-  NEXT_PUBLIC_API_BASE_URL = "https://your-existing-system-api.com"
-  NEXT_PUBLIC_SUPABASE_URL = "your_supabase_url"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your_supabase_anon_key"
+  # Environment variables that don't contain sensitive data
   NEXT_PUBLIC_SITE_URL = "https://baltzartandvardcursor.netlify.app"
   
-  # Muntra API Configuration
-  MUNTRA_API_BASE_URL = "https://api.muntra.com" # Replace with actual Muntra API URL
-  MUNTRA_API_KEY = "your_muntra_api_key" # Replace with actual Muntra API key
+  # Note: Supabase credentials should be set via Netlify UI environment variables
+  # DO NOT hardcode sensitive credentials here - they should be set in Netlify UI
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
