@@ -3,33 +3,48 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { i18n } from "./lib/i18n-config"
 
+// List of paths to explicitly ignore in the middleware
+const PUBLIC_FILE = /\.(.*)$/;
+
 export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname
+
+  // 1. Check if the path is for a public file (asset) or API route
+  // Skip middleware processing for these paths
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') || // _next/static, _next/image, etc.
+    PUBLIC_FILE.test(pathname) || // Matches files with extensions (e.g., .ico, .png)
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
+  ) {
+    return NextResponse.next() // Let the request proceed without modification
+  }
+
+  // --- The rest of your existing middleware logic --- 
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
   const {
     data: { session },
   } = await supabase.auth.getSession()
-
-  const pathname = req.nextUrl.pathname
   
-  // If accessing the root domain, redirect to the default locale
+  // 2. Handle root path redirect to default locale
   if (pathname === '/') {
     const url = req.nextUrl.clone()
     url.pathname = `/${i18n.defaultLocale}`
     return NextResponse.redirect(url)
   }
 
-  // Check if the pathname is missing a locale
+  // 3. Handle missing locale prefix
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
   )
 
-  // If it's missing a locale, redirect to the default locale
   if (pathnameIsMissingLocale) {
     const locale = i18n.defaultLocale
     const url = req.nextUrl.clone()
-    url.pathname = `/${locale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`
+    url.pathname = `/${locale}${pathname}` // Simplification: pathname already includes leading /
     return NextResponse.redirect(url)
   }
 
@@ -92,11 +107,17 @@ export async function middleware(req: NextRequest) {
   return res
 }
 
+// Update matcher to be simpler - let the function logic handle exclusions
 export const config = {
-  // Match all request paths except for the ones starting with:
-  // - api (API routes)
-  // - _next/static (static files)
-  // - _next/image (image optimization files)
-  // - favicon.ico (favicon file)
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * --- Let the function handle these exclusions explicitly ---
+     */
+    '/((?!_next/static|_next/image|assets|favicon.ico|sw.js).*)',
+  ],
 }
