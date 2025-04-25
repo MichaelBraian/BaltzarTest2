@@ -8,6 +8,10 @@ const nextConfig = {
   experimental: {
     // Remove optimizeCss as it requires the critters package
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // Enable build cache
+    turbotrace: {
+      enabled: true,
+    },
   },
   compiler: {
     // Remove console.log in production
