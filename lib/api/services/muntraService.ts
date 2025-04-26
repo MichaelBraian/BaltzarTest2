@@ -82,6 +82,12 @@ export class MuntraService {
 
       const data = await response.json()
       
+      // Log the raw API response
+      console.log('Raw Muntra API response:', {
+        responseData: data,
+        patientsCount: data.data?.length || 0
+      });
+      
       // Check if any patients were found with the given email
       const patients = data.data || []
       const patient = patients.find((p: any) => 
@@ -89,6 +95,12 @@ export class MuntraService {
       )
       
       if (patient) {
+        // Log the found patient data
+        console.log('Found patient in Muntra:', {
+          id: patient.id,
+          rawAttributes: patient.attributes,
+        });
+        
         // Get complete patient details - search only returns basic info
         let patientDetails: any = null
         try {
@@ -100,6 +112,20 @@ export class MuntraService {
           if (detailsResponse.ok) {
             const detailsData = await detailsResponse.json();
             patientDetails = detailsData.data || null;
+            
+            // Log the detailed patient data
+            console.log('Detailed patient data from Muntra:', {
+              hasData: !!patientDetails,
+              rawAttributes: patientDetails?.attributes,
+              addressFields: patientDetails?.attributes ? {
+                address_1: patientDetails.attributes.address_1,
+                address: patientDetails.attributes.address,
+                postal_code: patientDetails.attributes.postal_code,
+                postalcode: patientDetails.attributes.postalcode,
+                city: patientDetails.attributes.city,
+                country: patientDetails.attributes.country
+              } : null
+            });
           }
         } catch (err) {
           console.error('Failed to fetch detailed patient info:', err);
