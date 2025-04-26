@@ -121,13 +121,26 @@ export class MuntraService {
                  patientInfo.phone_number_work || 
                  patientInfo.phone_number_home || 
                  patientInfo.phone || '',
-          // Use the correct address fields
-          address: patientInfo.address_1 || '',
-          postalCode: patientInfo.postal_code || '',
+          // Use the correct address fields from patient attributes
+          address: patientInfo.address_1 || patientInfo.address || '',
+          postalCode: patientInfo.postal_code || patientInfo.postalcode || '',
           city: patientInfo.city || '',
           country: patientInfo.country || '',
           insuranceInformation: patientInfo.insurance_information || patientInfo.insurance || 'Folktandvården Insurance',
         }
+        
+        // Log the mapped patient data for debugging
+        console.log('Mapped Muntra patient data:', {
+          hasAddress: !!muntraPatient.address,
+          address: muntraPatient.address,
+          postalCode: muntraPatient.postalCode,
+          rawAddressData: {
+            address_1: patientInfo.address_1,
+            address: patientInfo.address,
+            postal_code: patientInfo.postal_code,
+            postalcode: patientInfo.postalcode,
+          }
+        });
         
         // Fetch appointments separately with a more specific endpoint
         try {

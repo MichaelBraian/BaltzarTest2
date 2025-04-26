@@ -87,10 +87,12 @@ export async function GET(request: Request) {
           name: muntraPatient.name,
           email: muntraPatient.email,
           phone: muntraPatient.phone,
-          address: muntraPatient.address,
-          postalCode: muntraPatient.postalCode,
-          city: muntraPatient.city,
-          country: muntraPatient.country,
+          rawAddress: {
+            address: muntraPatient.address,
+            postalCode: muntraPatient.postalCode,
+            city: muntraPatient.city,
+            country: muntraPatient.country,
+          }
         });
         
         // Merge the Muntra data with the Supabase data
@@ -99,14 +101,15 @@ export async function GET(request: Request) {
           ...patientInfo,
           name: muntraPatient.name || patientInfo.name,
           phone: muntraPatient.phone || patientInfo.phone,
-          address: muntraPatient.address || patientInfo.address,
-          postalCode: muntraPatient.postalCode || patientInfo.postalCode,
-          city: muntraPatient.city || patientInfo.city,
-          country: muntraPatient.country || patientInfo.country,
+          // Ensure we're using the correct address fields from Muntra
+          address: muntraPatient.address || patientInfo.address || '',
+          postalCode: muntraPatient.postalCode || patientInfo.postalCode || '',
+          city: muntraPatient.city || patientInfo.city || '',
+          country: muntraPatient.country || patientInfo.country || '',
         }
         
-        // Log address data for debugging
-        console.log('Address data after merge:', {
+        // Log final merged data for debugging
+        console.log('Final merged patient data:', {
           address: patientInfo.address,
           postalCode: patientInfo.postalCode,
           city: patientInfo.city,
@@ -116,6 +119,10 @@ export async function GET(request: Request) {
             address: muntraPatient.address,
             postalCode: muntraPatient.postalCode,
             phone: muntraPatient.phone
+          },
+          supabaseData: {
+            address: userData.address,
+            postal_code: userData.postal_code
           }
         });
         

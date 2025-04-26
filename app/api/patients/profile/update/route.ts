@@ -60,8 +60,19 @@ export async function POST(request: Request) {
       postal_code: requestData.postalCode || '',
       city: requestData.city || '',
       country: requestData.country || '',
-      // Map other fields as needed
     }
+
+    // Log the update data for debugging
+    console.log('Sending update to Muntra:', {
+      patientId,
+      updateData,
+      addressFields: {
+        address: requestData.address,
+        postalCode: requestData.postalCode,
+        city: requestData.city,
+        country: requestData.country
+      }
+    });
 
     try {
       // Update patient data in Muntra using the actual service method
