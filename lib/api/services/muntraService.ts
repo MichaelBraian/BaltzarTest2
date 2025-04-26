@@ -70,7 +70,7 @@ export class MuntraService {
   // Verify if a patient exists in Muntra by searching for their email
   async verifyPatient(email: string): Promise<MuntraVerificationResponse> {
     try {
-      // Use the search-patients endpoint to find a patient by email
+      // First, search for the patient by email
       const response = await fetch(`${this.baseUrl}/api/search-patients?query=${encodeURIComponent(email)}`, {
         method: 'GET',
         headers: this.getHeaders(),
@@ -81,155 +81,86 @@ export class MuntraService {
       }
 
       const data = await response.json()
-      
-      // Log the raw API response
-      console.log('Raw Muntra API response:', {
-        responseData: data,
-        patientsCount: data.data?.length || 0
-      });
-      
-      // Check if any patients were found with the given email
       const patients = data.data || []
+      
+      // Find patient with exact email match
       const patient = patients.find((p: any) => 
         p.attributes && p.attributes.e_mail_address === email
       )
       
       if (patient) {
-        // Log the found patient data
-        console.log('Found patient in Muntra:', {
-          id: patient.id,
-          rawAttributes: patient.attributes,
-        });
-        
-        // Get complete patient details - search only returns basic info
-        let patientDetails: any = null
+        // Get complete patient details using the patient ID
         try {
-          const detailsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}`, {
+          // Use the correct endpoint for detailed patient information
+          const detailsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/details`, {
             method: 'GET',
             headers: this.getHeaders(),
           });
           
-          if (detailsResponse.ok) {
-            const detailsData = await detailsResponse.json();
-            patientDetails = detailsData.data || null;
-            
-            // Log the detailed patient data
-            console.log('Detailed patient data from Muntra:', {
-              hasData: !!patientDetails,
-              rawAttributes: patientDetails?.attributes,
-              addressFields: patientDetails?.attributes ? {
-                address_1: patientDetails.attributes.address_1,
-                address: patientDetails.attributes.address,
-                postal_code: patientDetails.attributes.postal_code,
-                postalcode: patientDetails.attributes.postalcode,
-                city: patientDetails.attributes.city,
-                country: patientDetails.attributes.country
-              } : null
-            });
+          if (!detailsResponse.ok) {
+            throw new Error(`Failed to fetch patient details: ${detailsResponse.statusText}`);
           }
-        } catch (err) {
-          console.error('Failed to fetch detailed patient info:', err);
-          // Continue with basic info if detailed fetch fails
-        }
-        
-        // Combine basic and detailed info, preferring detailed when available
-        const patientInfo = patientDetails?.attributes || patient.attributes || {};
-        
-        // Map the Muntra patient data to our interface
-        const muntraPatient: MuntraPatient = {
-          id: patient.id,
-          email: patientInfo.e_mail_address || '',
-          name: `${patientInfo.first_name || ''} ${patientInfo.last_name || ''}`.trim(),
-          firstName: patientInfo.first_name || '',
-          lastName: patientInfo.last_name || '',
-          // Try all phone number fields in order of priority
-          phone: patientInfo.phone_number_cell || 
-                 patientInfo.phone_number_work || 
-                 patientInfo.phone_number_home || 
-                 patientInfo.phone || '',
-          // Use the correct address fields from patient attributes
-          address: patientInfo.address_1 || patientInfo.address || '',
-          postalCode: patientInfo.postal_code || patientInfo.postalcode || '',
-          city: patientInfo.city || '',
-          country: patientInfo.country || '',
-          insuranceInformation: patientInfo.insurance_information || patientInfo.insurance || 'Folktandvården Insurance',
-        }
-        
-        // Log the mapped patient data for debugging
-        console.log('Mapped Muntra patient data:', {
-          hasAddress: !!muntraPatient.address,
-          address: muntraPatient.address,
-          postalCode: muntraPatient.postalCode,
-          rawAddressData: {
-            address_1: patientInfo.address_1,
-            address: patientInfo.address,
-            postal_code: patientInfo.postal_code,
-            postalcode: patientInfo.postalcode,
-          }
-        });
-        
-        // Fetch appointments separately with a more specific endpoint
-        try {
-          // First try appointments via upcoming endpoint (more likely to have current appointments)
-          const upcomingResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments/upcoming`, {
-            method: 'GET',
-            headers: this.getHeaders(),
+
+          const detailsData = await detailsResponse.json();
+          const patientDetails = detailsData.data?.attributes || {};
+
+          // Map the patient data with all available fields
+          const muntraPatient: MuntraPatient = {
+            id: patient.id,
+            email: patientDetails.e_mail_address || patient.attributes.e_mail_address || '',
+            name: `${patientDetails.first_name || ''} ${patientDetails.last_name || ''}`.trim(),
+            firstName: patientDetails.first_name || '',
+            lastName: patientDetails.last_name || '',
+            // Get phone numbers in order of priority
+            phone: patientDetails.phone_number_cell || 
+                   patientDetails.phone_number_work || 
+                   patientDetails.phone_number_home || 
+                   patientDetails.phone || '',
+            // Get address information
+            address: patientDetails.address_1 || patientDetails.address || '',
+            postalCode: patientDetails.postal_code || patientDetails.postalcode || '',
+            city: patientDetails.city || '',
+            country: patientDetails.country || '',
+            insuranceInformation: patientDetails.insurance_information || '',
+          };
+
+          console.log('Mapped patient data:', {
+            id: muntraPatient.id,
+            name: muntraPatient.name,
+            phone: muntraPatient.phone,
+            address: muntraPatient.address,
+            postalCode: muntraPatient.postalCode,
+            rawDetails: patientDetails
           });
-          
-          let appointments: any[] = [];
-          
-          if (upcomingResponse.ok) {
-            const upcomingData = await upcomingResponse.json();
-            appointments = upcomingData.data || [];
-          }
-          
-          // If no upcoming appointments, try all appointments
-          if (appointments.length === 0) {
-            const allAppointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments`, {
-              method: 'GET',
-              headers: this.getHeaders(),
-            });
-            
-            if (allAppointmentsResponse.ok) {
-              const appointmentsData = await allAppointmentsResponse.json();
-              appointments = appointmentsData.data || [];
+
+          return {
+            exists: true,
+            patientId: patient.id,
+            patient: muntraPatient
+          };
+        } catch (detailsError) {
+          console.error('Error fetching patient details:', detailsError);
+          // If details fetch fails, return basic patient info
+          return {
+            exists: true,
+            patientId: patient.id,
+            patient: {
+              id: patient.id,
+              email: patient.attributes.e_mail_address || '',
+              name: `${patient.attributes.first_name || ''} ${patient.attributes.last_name || ''}`.trim(),
+              firstName: patient.attributes.first_name || '',
+              lastName: patient.attributes.last_name || '',
+              phone: patient.attributes.phone_number_cell || 
+                     patient.attributes.phone_number_work || 
+                     patient.attributes.phone_number_home || 
+                     patient.attributes.phone || '',
+              address: patient.attributes.address_1 || patient.attributes.address || '',
+              postalCode: patient.attributes.postal_code || patient.attributes.postalcode || '',
+              city: patient.attributes.city || '',
+              country: patient.attributes.country || '',
+              insuranceInformation: patient.attributes.insurance_information || '',
             }
-          }
-          
-          // Map appointments to our format
-          if (appointments.length > 0) {
-            muntraPatient.appointments = appointments.map((appt: any) => {
-              const attrs = appt.attributes || {};
-              return {
-            id: appt.id,
-                date: attrs.date || attrs.appointment_date || '',
-                time: attrs.time || attrs.appointment_time || '',
-                duration: attrs.duration || 30,
-                clinicName: (attrs.clinic && attrs.clinic.name) || attrs.clinic_name || '',
-                clinicianName: (attrs.clinician && attrs.clinician.name) || attrs.clinician_name || '',
-                status: attrs.status || 'scheduled',
-                type: attrs.type || attrs.appointment_type || 'consultation',
-                notes: attrs.notes || '',
-                location: attrs.location || ''
-              };
-            });
-            
-            // Sort appointments by date (most recent first)
-            muntraPatient.appointments.sort((a, b) => {
-              const dateA = new Date(`${a.date} ${a.time}`);
-              const dateB = new Date(`${b.date} ${b.time}`);
-              return dateA.getTime() - dateB.getTime(); // Ascending order
-            });
-          }
-        } catch (err) {
-          console.error('Failed to fetch patient appointments:', err);
-          // Continue even if appointments fetch fails - non-critical
-        }
-        
-        return {
-          exists: true,
-          patientId: patient.id,
-          patient: muntraPatient
+          };
         }
       }
       

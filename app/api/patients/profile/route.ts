@@ -149,89 +149,49 @@ export async function GET(request: Request) {
             rawData: muntraPatient
           };
           
-          // Merge the Muntra data with the Supabase data
+          // Update patient info with Muntra data, preferring Muntra data over Supabase
           patientInfo = {
-            ...patientInfo,
+            ...patientInfo, // Keep Supabase data as fallback
             name: muntraPatient.name || patientInfo.name,
+            email: muntraPatient.email || patientInfo.email,
             phone: muntraPatient.phone || patientInfo.phone,
-            address: muntraPatient.address || patientInfo.address || '',
-            postalCode: muntraPatient.postalCode || patientInfo.postalCode || '',
-            city: muntraPatient.city || patientInfo.city || '',
-            country: muntraPatient.country || patientInfo.country || '',
+            address: muntraPatient.address || patientInfo.address,
+            postalCode: muntraPatient.postalCode || patientInfo.postalCode,
+            city: muntraPatient.city || patientInfo.city,
+            country: muntraPatient.country || patientInfo.country,
           }
           
-          debugInfo.mergedData = {
-            finalAddress: patientInfo.address,
-            finalPostalCode: patientInfo.postalCode,
-            finalCity: patientInfo.city,
-            finalCountry: patientInfo.country,
-            muntraAddress: muntraPatient.address,
-            muntraPostalCode: muntraPatient.postalCode,
-            supabaseAddress: userData.address,
-            supabasePostalCode: userData.postal_code,
-            rawMuntraPatient: muntraPatient,
-            rawSupabaseData: userData
-          };
-          
-          // Handle appointments - always fetch separately to ensure fresh data
+          // Log the data we're using
+          console.log('Patient data sources:', {
+            muntra: {
+              name: muntraPatient.name,
+              phone: muntraPatient.phone,
+              address: muntraPatient.address,
+              postalCode: muntraPatient.postalCode,
+            },
+            supabase: {
+              name: userData.full_name,
+              phone: userData.phone,
+              address: userData.address,
+              postalCode: userData.postal_code,
+            },
+            final: {
+              name: patientInfo.name,
+              phone: patientInfo.phone,
+              address: patientInfo.address,
+              postalCode: patientInfo.postalCode,
+            }
+          });
+
+          // Get appointments if available
           if (verificationResult.patientId) {
-            console.log('Fetching appointments for patient ID:', verificationResult.patientId);
-            const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId)
-            console.log(`Found ${patientAppointments.length} appointments`);
-            
-            // Log appointment details for debugging
-            if (patientAppointments && patientAppointments.length > 0) {
-              console.log('First appointment details:', JSON.stringify(patientAppointments[0]));
-              patientInfo.appointments = patientAppointments;
-            } else {
-              console.log('No appointments returned from getPatientAppointments');
-              
-              // Try one more attempt with a different endpoint
-              try {
-                console.log('Attempting to fetch appointments with direct endpoint call');
-                const directResponse = await fetch(`${process.env.MUNTRA_API_BASE_URL}/api/patients/${verificationResult.patientId}/appointments`, {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.MUNTRA_API_KEY}`,
-                  },
-                });
-                
-                if (directResponse.ok) {
-                  const directData = await directResponse.json();
-                  console.log(`Direct endpoint returned ${directData.data?.length || 0} appointments`);
-                  
-                  if (directData.data && directData.data.length > 0) {
-                    // Map the appointments directly
-                    const mappedAppointments = directData.data.map((appt: any) => {
-                      const attrs = appt.attributes || {};
-                      return {
-                        id: appt.id,
-                        date: attrs.date || attrs.appointment_date || '',
-                        time: attrs.time || attrs.appointment_time || '',
-                        duration: attrs.duration || 30,
-                        clinicName: (attrs.clinic && attrs.clinic.name) || attrs.clinic_name || '',
-                        clinicianName: (attrs.clinician && attrs.clinician.name) || attrs.clinician_name || '',
-                        status: attrs.status || 'scheduled',
-                        type: attrs.type || attrs.appointment_type || 'consultation',
-                        notes: attrs.notes || '',
-                        location: attrs.location || ''
-                      };
-                    });
-                    
-                    patientInfo.appointments = mappedAppointments;
-                    console.log('Successfully mapped appointments from direct endpoint');
-                  }
-                } else {
-                  console.log('Direct endpoint call failed with status:', directResponse.status);
-                }
-              } catch (directErr) {
-                console.error('Error in direct appointment fetch:', directErr);
-              }
+            const appointments = await muntraService.getPatientAppointments(verificationResult.patientId);
+            if (appointments && appointments.length > 0) {
+              patientInfo.appointments = appointments;
             }
           }
         } else {
-          console.log('No Muntra patient found for email:', userEmail);
+          console.log('No Muntra patient found, using Supabase data only:', userData);
         }
       } catch (error) {
         console.error('Error fetching Muntra patient data:', error);
@@ -246,6 +206,7 @@ export async function GET(request: Request) {
         success: true,
         patient: patientInfo,
         debug: debugInfo,
+        source: verificationResult.exists ? 'muntra' : 'supabase',
         _timestamp: new Date().toISOString()
       })
     } catch (error) {
