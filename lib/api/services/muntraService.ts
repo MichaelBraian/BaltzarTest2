@@ -112,12 +112,16 @@ export class MuntraService {
         // Map the Muntra patient data to our interface
         const muntraPatient: MuntraPatient = {
           id: patient.id,
-          email: patientInfo.e_mail_address || patientInfo.email || '',
+          email: patientInfo.e_mail_address || '',
           name: `${patientInfo.first_name || ''} ${patientInfo.last_name || ''}`.trim(),
           firstName: patientInfo.first_name || '',
           lastName: patientInfo.last_name || '',
-          phone: patientInfo.phone_number_cell || patientInfo.phone_number_work || patientInfo.phone_number_home || patientInfo.phone || '',
-          // Use the correct field name for address
+          // Try all phone number fields in order of priority
+          phone: patientInfo.phone_number_cell || 
+                 patientInfo.phone_number_work || 
+                 patientInfo.phone_number_home || 
+                 patientInfo.phone || '',
+          // Use the correct address fields
           address: patientInfo.address_1 || '',
           postalCode: patientInfo.postal_code || '',
           city: patientInfo.city || '',
@@ -240,45 +244,26 @@ export class MuntraService {
         console.error('Failed to fetch additional patient details:', err);
         // Continue even if additional details fail - non-critical
       }
-
-      // Fetch appointments (if any)
-      let appointments: MuntraAppointment[] = [];
-      try {
-        const appointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patientId}/appointments`, {
-          method: 'GET',
-          headers: this.getHeaders(),
-        });
-        
-        if (appointmentsResponse.ok) {
-          const appointmentsData = await appointmentsResponse.json();
-          appointments = (appointmentsData.data || []).map((appt: any) => ({
-            id: appt.id,
-            date: appt.attributes?.date || '',
-            time: appt.attributes?.time || '',
-            duration: appt.attributes?.duration || 30,
-            clinicName: appt.attributes?.clinic?.name || '',
-            clinicianName: appt.attributes?.clinician?.name || '',
-            status: appt.attributes?.status || 'scheduled',
-            type: appt.attributes?.type || 'consultation'
-          }));
-        }
-      } catch (err) {
-        console.error('Failed to fetch patient appointments:', err);
-        // Continue even if appointments fetch fails - non-critical
-      }
       
       // Return a complete patient profile with all available data
       return {
         id: patientId,
         email: email,
-        name: patientAttributes.name || patientAttributes.first_name + ' ' + patientAttributes.last_name || '',
-        phone: patientAttributes.phone || patientAttributes.phone_number_cell || patientAttributes.phone_number_home || '',
-        address: additionalDetails.address || patientAttributes.address || '',
+        name: patientAttributes.name || `${patientAttributes.first_name || ''} ${patientAttributes.last_name || ''}`.trim(),
+        firstName: patientAttributes.first_name || '',
+        lastName: patientAttributes.last_name || '',
+        // Try all phone number fields in order of priority
+        phone: patientAttributes.phone_number_cell || 
+               patientAttributes.phone_number_work || 
+               patientAttributes.phone_number_home || 
+               patientAttributes.phone || '',
+        // Use the correct address fields
+        address: additionalDetails.address_1 || patientAttributes.address_1 || '',
         postalCode: additionalDetails.postal_code || patientAttributes.postal_code || '',
         city: additionalDetails.city || patientAttributes.city || '',
         country: additionalDetails.country || patientAttributes.country || '',
-        insuranceInformation: additionalDetails.insurance || patientAttributes.insurance_information || '',
-        appointments: appointments,
+        insuranceInformation: additionalDetails.insurance_information || patientAttributes.insurance_information || '',
+        appointments: [],  // Will be populated separately
       };
     } catch (error) {
       console.error('Error fetching patient details:', error);

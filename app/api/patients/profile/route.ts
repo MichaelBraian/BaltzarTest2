@@ -82,6 +82,17 @@ export async function GET(request: Request) {
       if (verificationResult.exists && verificationResult.patient) {
         const muntraPatient = verificationResult.patient;
         
+        // Log the raw Muntra patient data for debugging
+        console.log('Raw Muntra patient data:', {
+          name: muntraPatient.name,
+          email: muntraPatient.email,
+          phone: muntraPatient.phone,
+          address: muntraPatient.address,
+          postalCode: muntraPatient.postalCode,
+          city: muntraPatient.city,
+          country: muntraPatient.country,
+        });
+        
         // Merge the Muntra data with the Supabase data
         // Prefer Muntra data for medical information but keep user preferences from Supabase
         patientInfo = {
@@ -100,8 +111,12 @@ export async function GET(request: Request) {
           postalCode: patientInfo.postalCode,
           city: patientInfo.city,
           country: patientInfo.country,
-          muntraAddress: muntraPatient.address,
-          muntraPostalCode: muntraPatient.postalCode
+          phone: patientInfo.phone,
+          muntraData: {
+            address: muntraPatient.address,
+            postalCode: muntraPatient.postalCode,
+            phone: muntraPatient.phone
+          }
         });
         
         // Handle appointments - always fetch separately to ensure fresh data

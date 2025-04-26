@@ -52,10 +52,10 @@ export async function POST(request: Request) {
     // Prepare data to update in Muntra format
     const patientId = patientVerification.patientId
     const updateData = {
-      firstName: requestData.fullName?.split(' ')[0] || '',
-      lastName: requestData.fullName?.split(' ').slice(1).join(' ') || '',
-      phoneNumberCell: requestData.phone || '',
-      email: userEmail,
+      first_name: requestData.fullName?.split(' ')[0] || '',
+      last_name: requestData.fullName?.split(' ').slice(1).join(' ') || '',
+      phone_number_cell: requestData.phone || '',
+      e_mail_address: userEmail,
       address_1: requestData.address || '',
       postal_code: requestData.postalCode || '',
       city: requestData.city || '',
@@ -74,7 +74,9 @@ export async function POST(request: Request) {
         updatedPatient: updatedPatient ? {
           hasAddress: !!updatedPatient.address,
           address: updatedPatient.address,
-          postalCode: updatedPatient.postalCode
+          postalCode: updatedPatient.postalCode,
+          phone: updatedPatient.phone,
+          email: updatedPatient.email
         } : null
       });
       
