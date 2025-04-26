@@ -56,8 +56,8 @@ export async function POST(request: Request) {
       lastName: requestData.fullName?.split(' ').slice(1).join(' ') || '',
       phoneNumberCell: requestData.phone || '',
       email: userEmail,
-      address: requestData.address || '',
-      postalCode: requestData.postalCode || '',
+      address_1: requestData.address || '',
+      postal_code: requestData.postalCode || '',
       city: requestData.city || '',
       country: requestData.country || '',
       // Map other fields as needed
@@ -66,6 +66,17 @@ export async function POST(request: Request) {
     try {
       // Update patient data in Muntra using the actual service method
       const updatedPatient = await muntraService.updatePatientProfile(patientId, updateData)
+      
+      // Log the update attempt for debugging
+      console.log('Update attempt:', {
+        patientId,
+        updateData,
+        updatedPatient: updatedPatient ? {
+          hasAddress: !!updatedPatient.address,
+          address: updatedPatient.address,
+          postalCode: updatedPatient.postalCode
+        } : null
+      });
       
       return NextResponse.json({
         success: true,

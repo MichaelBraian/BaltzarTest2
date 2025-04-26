@@ -162,42 +162,42 @@ export default async function PatientProfilePage({ params }: Props) {
           if (!appointments || appointments.length === 0) {
             console.log('Trying direct Muntra service call for appointments');
             const verificationResult = await muntraService.verifyPatient(userEmail)
-            
-            if (verificationResult.exists && verificationResult.patient) {
-              // Use the patient data from the verification result
-              patientInfo = {
-                ...patientInfo,
-                ...verificationResult.patient,
-              }
-              
-              // Get appointments if not included in verification result
-              if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
-                try {
+        
+        if (verificationResult.exists && verificationResult.patient) {
+          // Use the patient data from the verification result
+          patientInfo = {
+            ...patientInfo,
+            ...verificationResult.patient,
+          }
+          
+          // Get appointments if not included in verification result
+          if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
+            try {
                   console.log('Fetching appointments directly from Muntra service')
-                  const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
+              const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
                   console.log(`Fetched ${patientAppointments.length} appointments directly from Muntra`)
                   
-                  if (patientAppointments && patientAppointments.length > 0) {
+              if (patientAppointments && patientAppointments.length > 0) {
                     appointments = patientAppointments
-                  }
-                } catch (err) {
-                  console.error('Failed to fetch appointments:', err)
-                }
+              }
+            } catch (err) {
+              console.error('Failed to fetch appointments:', err)
+            }
               } else if (patientInfo.appointments && patientInfo.appointments.length > 0) {
                 appointments = [...patientInfo.appointments]
                 console.log(`Using ${appointments.length} appointments from verification result`)
-              }
-            } else {
-              // No Muntra record, falling back to mock data
-              patientInfo = {
-                ...patientInfo,
-                lastVisit: '2023-01-15',
-                nextAppointment: '2023-08-20 at 14:30',
-                dentist: 'Dr. Sara Lindberg',
-                clinic: 'Baltzar Tandvård',
-                status: 'Regular Patient',
-                insurance: 'Folktandvården Insurance'
-              }
+          }
+        } else {
+          // No Muntra record, falling back to mock data
+          patientInfo = {
+            ...patientInfo,
+            lastVisit: '2023-01-15',
+            nextAppointment: '2023-08-20 at 14:30',
+            dentist: 'Dr. Sara Lindberg',
+            clinic: 'Baltzar Tandvård',
+            status: 'Regular Patient',
+            insurance: 'Folktandvården Insurance'
+          }
             }
           }
         }

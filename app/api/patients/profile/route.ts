@@ -99,7 +99,9 @@ export async function GET(request: Request) {
           address: patientInfo.address,
           postalCode: patientInfo.postalCode,
           city: patientInfo.city,
-          country: patientInfo.country
+          country: patientInfo.country,
+          muntraAddress: muntraPatient.address,
+          muntraPostalCode: muntraPatient.postalCode
         });
         
         // Handle appointments - always fetch separately to ensure fresh data

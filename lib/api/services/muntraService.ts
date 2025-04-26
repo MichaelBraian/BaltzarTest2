@@ -117,9 +117,9 @@ export class MuntraService {
           firstName: patientInfo.first_name || '',
           lastName: patientInfo.last_name || '',
           phone: patientInfo.phone_number_cell || patientInfo.phone_number_work || patientInfo.phone_number_home || patientInfo.phone || '',
-          // Try all possible address field variations
-          address: patientInfo.address_1 || patientInfo.address1 || patientInfo.address || '',
-          postalCode: patientInfo.postal_code || patientInfo.postalCode || patientInfo.zip_code || patientInfo.zipCode || '',
+          // Use the correct field name for address
+          address: patientInfo.address_1 || '',
+          postalCode: patientInfo.postal_code || '',
           city: patientInfo.city || '',
           country: patientInfo.country || '',
           insuranceInformation: patientInfo.insurance_information || patientInfo.insurance || 'Folktandvården Insurance',
@@ -158,7 +158,7 @@ export class MuntraService {
             muntraPatient.appointments = appointments.map((appt: any) => {
               const attrs = appt.attributes || {};
               return {
-                id: appt.id,
+            id: appt.id,
                 date: attrs.date || attrs.appointment_date || '',
                 time: attrs.time || attrs.appointment_time || '',
                 duration: attrs.duration || 30,
@@ -295,7 +295,7 @@ export class MuntraService {
       // Map the data fields to the Muntra API expected format
       if (data.name) updateAttributes.name = data.name
       if (data.phone) updateAttributes.phone = data.phone
-      if (data.address) updateAttributes.address = data.address
+      if (data.address) updateAttributes.address_1 = data.address
       if (data.postalCode) updateAttributes.postal_code = data.postalCode
       if (data.city) updateAttributes.city = data.city
       if (data.country) updateAttributes.country = data.country
@@ -343,10 +343,10 @@ export class MuntraService {
       
       try {
         const upcomingResponse = await fetch(`${this.baseUrl}/api/patients/${patientId}/appointments/upcoming`, {
-          method: 'GET',
-          headers: this.getHeaders(),
+        method: 'GET',
+        headers: this.getHeaders(),
         });
-        
+
         if (upcomingResponse.ok) {
           const upcomingData = await upcomingResponse.json();
           appointments = upcomingData.data || [];
@@ -365,8 +365,8 @@ export class MuntraService {
         
         if (!allAppointmentsResponse.ok) {
           throw new Error(`Muntra API error: ${allAppointmentsResponse.statusText}`);
-        }
-        
+      }
+
         const data = await allAppointmentsResponse.json();
         appointments = data.data || [];
       }
@@ -376,7 +376,7 @@ export class MuntraService {
         const attrs = appt.attributes || {};
         
         return {
-          id: appt.id,
+        id: appt.id,
           date: attrs.date || attrs.appointment_date || '',
           time: attrs.time || attrs.appointment_time || '',
           duration: attrs.duration || 30,
