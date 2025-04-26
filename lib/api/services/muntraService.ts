@@ -89,40 +89,94 @@ export class MuntraService {
       )
       
       if (patient) {
-        // Map the Muntra patient data to our interface
-        const muntraPatient: MuntraPatient = {
-          id: patient.id,
-          email: patient.attributes.e_mail_address,
-          name: patient.attributes.first_name + ' ' + patient.attributes.last_name,
-          firstName: patient.attributes.first_name,
-          lastName: patient.attributes.last_name,
-          phone: patient.attributes.phone_number_cell || patient.attributes.phone_number_work || patient.attributes.phone_number_home || '',
-          address: patient.attributes.address_1 || patient.attributes.address || '',
-          postalCode: patient.attributes.postal_code || '',
-          city: patient.attributes.city || '',
-          country: patient.attributes.country || '',
-          insuranceInformation: patient.attributes.insurance_information || 'Folktandvården Insurance',
-        }
-        
-        // Fetch appointments separately - they're not typically included in the patient search results
+        // Get complete patient details - search only returns basic info
+        let patientDetails: any = null
         try {
-          const appointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments`, {
+          const detailsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}`, {
             method: 'GET',
             headers: this.getHeaders(),
           });
           
-          if (appointmentsResponse.ok) {
-            const appointmentsData = await appointmentsResponse.json();
-            muntraPatient.appointments = (appointmentsData.data || []).map((appt: any) => ({
-              id: appt.id,
-              date: appt.attributes?.date || '',
-              time: appt.attributes?.time || '',
-              duration: appt.attributes?.duration || 30,
-              clinicName: appt.attributes?.clinic?.name || '',
-              clinicianName: appt.attributes?.clinician?.name || '',
-              status: appt.attributes?.status || 'scheduled',
-              type: appt.attributes?.type || 'consultation'
-            }));
+          if (detailsResponse.ok) {
+            const detailsData = await detailsResponse.json();
+            patientDetails = detailsData.data || null;
+          }
+        } catch (err) {
+          console.error('Failed to fetch detailed patient info:', err);
+          // Continue with basic info if detailed fetch fails
+        }
+        
+        // Combine basic and detailed info, preferring detailed when available
+        const patientInfo = patientDetails?.attributes || patient.attributes || {};
+        
+        // Map the Muntra patient data to our interface
+        const muntraPatient: MuntraPatient = {
+          id: patient.id,
+          email: patientInfo.e_mail_address || patientInfo.email || '',
+          name: `${patientInfo.first_name || ''} ${patientInfo.last_name || ''}`.trim(),
+          firstName: patientInfo.first_name || '',
+          lastName: patientInfo.last_name || '',
+          phone: patientInfo.phone_number_cell || patientInfo.phone_number_work || patientInfo.phone_number_home || patientInfo.phone || '',
+          // Try all possible address field variations
+          address: patientInfo.address_1 || patientInfo.address1 || patientInfo.address || '',
+          postalCode: patientInfo.postal_code || patientInfo.postalCode || patientInfo.zip_code || patientInfo.zipCode || '',
+          city: patientInfo.city || '',
+          country: patientInfo.country || '',
+          insuranceInformation: patientInfo.insurance_information || patientInfo.insurance || 'Folktandvården Insurance',
+        }
+        
+        // Fetch appointments separately with a more specific endpoint
+        try {
+          // First try appointments via upcoming endpoint (more likely to have current appointments)
+          const upcomingResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments/upcoming`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+          });
+          
+          let appointments: any[] = [];
+          
+          if (upcomingResponse.ok) {
+            const upcomingData = await upcomingResponse.json();
+            appointments = upcomingData.data || [];
+          }
+          
+          // If no upcoming appointments, try all appointments
+          if (appointments.length === 0) {
+            const allAppointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments`, {
+              method: 'GET',
+              headers: this.getHeaders(),
+            });
+            
+            if (allAppointmentsResponse.ok) {
+              const appointmentsData = await allAppointmentsResponse.json();
+              appointments = appointmentsData.data || [];
+            }
+          }
+          
+          // Map appointments to our format
+          if (appointments.length > 0) {
+            muntraPatient.appointments = appointments.map((appt: any) => {
+              const attrs = appt.attributes || {};
+              return {
+                id: appt.id,
+                date: attrs.date || attrs.appointment_date || '',
+                time: attrs.time || attrs.appointment_time || '',
+                duration: attrs.duration || 30,
+                clinicName: (attrs.clinic && attrs.clinic.name) || attrs.clinic_name || '',
+                clinicianName: (attrs.clinician && attrs.clinician.name) || attrs.clinician_name || '',
+                status: attrs.status || 'scheduled',
+                type: attrs.type || attrs.appointment_type || 'consultation',
+                notes: attrs.notes || '',
+                location: attrs.location || ''
+              };
+            });
+            
+            // Sort appointments by date (most recent first)
+            muntraPatient.appointments.sort((a, b) => {
+              const dateA = new Date(`${a.date} ${a.time}`);
+              const dateB = new Date(`${b.date} ${b.time}`);
+              return dateA.getTime() - dateB.getTime(); // Ascending order
+            });
           }
         } catch (err) {
           console.error('Failed to fetch patient appointments:', err);
@@ -284,39 +338,81 @@ export class MuntraService {
         throw new Error('Patient ID is required to fetch appointments')
       }
 
-      // Make API call to get appointments
-      const response = await fetch(`${this.baseUrl}/api/patients/${patientId}/appointments`, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Muntra API error: ${response.statusText}`)
-      }
-
-      const data = await response.json()
+      // First try to get upcoming appointments (most relevant)
+      let appointments: any[] = [];
       
-      // Map response to our appointment interface
-      return (data.data || []).map((appt: any) => {
-        const attributes = appt.attributes || {}
+      try {
+        const upcomingResponse = await fetch(`${this.baseUrl}/api/patients/${patientId}/appointments/upcoming`, {
+          method: 'GET',
+          headers: this.getHeaders(),
+        });
+        
+        if (upcomingResponse.ok) {
+          const upcomingData = await upcomingResponse.json();
+          appointments = upcomingData.data || [];
+        }
+      } catch (err) {
+        console.error('Error fetching upcoming appointments:', err);
+        // Continue and try fetching all appointments
+      }
+      
+      // If no upcoming appointments found, try getting all appointments
+      if (appointments.length === 0) {
+        const allAppointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patientId}/appointments`, {
+          method: 'GET',
+          headers: this.getHeaders(),
+        });
+        
+        if (!allAppointmentsResponse.ok) {
+          throw new Error(`Muntra API error: ${allAppointmentsResponse.statusText}`);
+        }
+        
+        const data = await allAppointmentsResponse.json();
+        appointments = data.data || [];
+      }
+      
+      // Map appointments to our format with robust field handling
+      const mappedAppointments = appointments.map((appt: any) => {
+        const attrs = appt.attributes || {};
+        
         return {
           id: appt.id,
-          date: attributes.date || '',
-          time: attributes.time || '',
-          duration: attributes.duration || 30,
-          clinicName: attributes.clinic?.name || attributes.clinic_name || '',
-          clinicianName: attributes.clinician?.name || attributes.clinician_name || '',
-          status: attributes.status || 'scheduled',
-          type: attributes.type || attributes.appointment_type || 'consultation',
-          // Add additional fields if they exist in the API response
-          notes: attributes.notes || '',
-          location: attributes.location || ''
+          date: attrs.date || attrs.appointment_date || '',
+          time: attrs.time || attrs.appointment_time || '',
+          duration: attrs.duration || 30,
+          clinicName: (attrs.clinic && attrs.clinic.name) || attrs.clinic_name || '',
+          clinicianName: (attrs.clinician && attrs.clinician.name) || attrs.clinician_name || '',
+          status: attrs.status || 'scheduled',
+          type: attrs.type || attrs.appointment_type || 'consultation',
+          notes: attrs.notes || '',
+          location: attrs.location || ''
+        };
+      });
+      
+      // Sort appointments by date (most recent first)
+      return mappedAppointments.sort((a, b) => {
+        // Handle potential invalid dates
+        let dateA: Date, dateB: Date;
+        try {
+          dateA = new Date(`${a.date} ${a.time}`);
+          if (isNaN(dateA.getTime())) dateA = new Date(0); // Default to epoch if invalid
+        } catch (e) {
+          dateA = new Date(0);
         }
-      })
+        
+        try {
+          dateB = new Date(`${b.date} ${b.time}`);
+          if (isNaN(dateB.getTime())) dateB = new Date(0);
+        } catch (e) {
+          dateB = new Date(0);
+        }
+        
+        return dateA.getTime() - dateB.getTime(); // Ascending order
+      });
     } catch (error) {
-      console.error('Error fetching patient appointments:', error)
+      console.error('Error fetching patient appointments:', error);
       // Return empty array instead of throwing to make this non-critical
-      return []
+      return [];
     }
   }
 }

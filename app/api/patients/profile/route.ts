@@ -30,6 +30,8 @@ export async function GET(request: Request) {
     // Get the user metadata from Supabase
     const userData = session.user.user_metadata || {}
     
+    console.log('User metadata from Supabase:', JSON.stringify(userData));
+    
     // Define the patient info type
     type PatientInfo = {
       name: string;
@@ -61,8 +63,21 @@ export async function GET(request: Request) {
 
     // Try to get patient data from Muntra
     try {
-      // First try to get patient data and appointments in one request
+      console.log('Fetching patient data from Muntra for email:', userEmail);
+      
+      // Verify patient exists and get basic info
       const verificationResult = await muntraService.verifyPatient(userEmail)
+      
+      console.log('Verification result:', JSON.stringify({
+        exists: verificationResult.exists,
+        patientId: verificationResult.patientId,
+        // Log patient data without potentially sensitive details
+        patient: verificationResult.patient ? {
+          name: verificationResult.patient.name,
+          hasAddress: !!verificationResult.patient.address,
+          hasAppointments: Array.isArray(verificationResult.patient.appointments) && verificationResult.patient.appointments.length > 0
+        } : null
+      }));
       
       if (verificationResult.exists && verificationResult.patient) {
         const muntraPatient = verificationResult.patient;
@@ -79,13 +94,26 @@ export async function GET(request: Request) {
           country: muntraPatient.country || patientInfo.country,
         }
         
-        // Handle appointments - always fetch them separately to ensure fresh data
+        // Log address data for debugging
+        console.log('Address data after merge:', {
+          address: patientInfo.address,
+          postalCode: patientInfo.postalCode,
+          city: patientInfo.city,
+          country: patientInfo.country
+        });
+        
+        // Handle appointments - always fetch separately to ensure fresh data
         if (verificationResult.patientId) {
+          console.log('Fetching appointments for patient ID:', verificationResult.patientId);
           const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId)
+          console.log(`Found ${patientAppointments.length} appointments`);
+          
           if (patientAppointments && patientAppointments.length > 0) {
-            patientInfo.appointments = patientAppointments
+            patientInfo.appointments = patientAppointments;
           }
         }
+      } else {
+        console.log('No Muntra patient found for email:', userEmail);
       }
     } catch (error) {
       console.error('Error fetching Muntra patient data:', error)
