@@ -16,6 +16,52 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+interface DebugInfo {
+  verificationResult: {
+    exists: boolean;
+    patientId?: string;
+    hasPatient: boolean;
+  } | null;
+  muntraPatientData: {
+    name: string;
+    email: string;
+    phone: string;
+    address?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
+  } | null;
+  mergedData: {
+    finalAddress: string;
+    finalPostalCode: string;
+    finalCity: string;
+    finalCountry: string;
+    muntraAddress?: string;
+    muntraPostalCode?: string;
+    supabaseAddress: string;
+    supabasePostalCode: string;
+  } | null;
+  errors: Array<{
+    message: string;
+    error: string;
+  }>;
+}
+
+function DebugPanel({ debug }: { debug: DebugInfo }) {
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
+
+  return (
+    <div className="mt-8 p-4 bg-gray-800 rounded-lg text-xs">
+      <h3 className="text-white font-bold mb-4">Debug Information</h3>
+      <pre className="text-green-400 whitespace-pre-wrap">
+        {JSON.stringify(debug, null, 2)}
+      </pre>
+    </div>
+  );
+}
+
 export default async function PatientProfilePage({ params }: Props) {
   const resolvedParams = await params
   const locale = resolvedParams.locale
@@ -522,6 +568,9 @@ export default async function PatientProfilePage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Add debug panel */}
+      {'debug' in patientInfo && <DebugPanel debug={patientInfo.debug} />}
     </div>
   )
 } 

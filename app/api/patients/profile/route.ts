@@ -62,69 +62,90 @@ export async function GET(request: Request) {
     }
 
     // Try to get patient data from Muntra
+    interface DebugInfo {
+      verificationResult: {
+        exists: boolean;
+        patientId?: string;
+        hasPatient: boolean;
+      } | null;
+      muntraPatientData: {
+        name: string;
+        email: string;
+        phone: string;
+        address?: string;
+        postalCode?: string;
+        city?: string;
+        country?: string;
+      } | null;
+      mergedData: {
+        finalAddress: string;
+        finalPostalCode: string;
+        finalCity: string;
+        finalCountry: string;
+        muntraAddress?: string;
+        muntraPostalCode?: string;
+        supabaseAddress: string;
+        supabasePostalCode: string;
+      } | null;
+      errors: Array<{
+        message: string;
+        error: string;
+      }>;
+    }
+
+    let debugInfo: DebugInfo = {
+      verificationResult: null,
+      muntraPatientData: null,
+      mergedData: null,
+      errors: []
+    };
+
     try {
       console.log('Fetching patient data from Muntra for email:', userEmail);
       
       // Verify patient exists and get basic info
       const verificationResult = await muntraService.verifyPatient(userEmail)
       
-      console.log('Verification result:', JSON.stringify({
+      debugInfo.verificationResult = {
         exists: verificationResult.exists,
         patientId: verificationResult.patientId,
-        // Log patient data without potentially sensitive details
-        patient: verificationResult.patient ? {
-          name: verificationResult.patient.name,
-          hasAddress: !!verificationResult.patient.address,
-          hasAppointments: Array.isArray(verificationResult.patient.appointments) && verificationResult.patient.appointments.length > 0
-        } : null
-      }));
+        hasPatient: !!verificationResult.patient
+      };
       
       if (verificationResult.exists && verificationResult.patient) {
         const muntraPatient = verificationResult.patient;
         
-        // Log the raw Muntra patient data for debugging
-        console.log('Raw Muntra patient data:', {
+        debugInfo.muntraPatientData = {
           name: muntraPatient.name,
           email: muntraPatient.email,
           phone: muntraPatient.phone,
-          rawAddress: {
-            address: muntraPatient.address,
-            postalCode: muntraPatient.postalCode,
-            city: muntraPatient.city,
-            country: muntraPatient.country,
-          }
-        });
+          address: muntraPatient.address,
+          postalCode: muntraPatient.postalCode,
+          city: muntraPatient.city,
+          country: muntraPatient.country,
+        };
         
         // Merge the Muntra data with the Supabase data
-        // Prefer Muntra data for medical information but keep user preferences from Supabase
         patientInfo = {
           ...patientInfo,
           name: muntraPatient.name || patientInfo.name,
           phone: muntraPatient.phone || patientInfo.phone,
-          // Ensure we're using the correct address fields from Muntra
           address: muntraPatient.address || patientInfo.address || '',
           postalCode: muntraPatient.postalCode || patientInfo.postalCode || '',
           city: muntraPatient.city || patientInfo.city || '',
           country: muntraPatient.country || patientInfo.country || '',
         }
         
-        // Log final merged data for debugging
-        console.log('Final merged patient data:', {
-          address: patientInfo.address,
-          postalCode: patientInfo.postalCode,
-          city: patientInfo.city,
-          country: patientInfo.country,
-          phone: patientInfo.phone,
-          muntraData: {
-            address: muntraPatient.address,
-            postalCode: muntraPatient.postalCode,
-            phone: muntraPatient.phone
-          },
-          supabaseData: {
-            address: userData.address,
-            postal_code: userData.postal_code
-          }
-        });
+        debugInfo.mergedData = {
+          finalAddress: patientInfo.address,
+          finalPostalCode: patientInfo.postalCode,
+          finalCity: patientInfo.city,
+          finalCountry: patientInfo.country,
+          muntraAddress: muntraPatient.address,
+          muntraPostalCode: muntraPatient.postalCode,
+          supabaseAddress: userData.address,
+          supabasePostalCode: userData.postal_code
+        };
         
         // Handle appointments - always fetch separately to ensure fresh data
         if (verificationResult.patientId) {
@@ -187,13 +208,17 @@ export async function GET(request: Request) {
         console.log('No Muntra patient found for email:', userEmail);
       }
     } catch (error) {
-      console.error('Error fetching Muntra patient data:', error)
-      // Continue with metadata only - non-fatal error
+      console.error('Error fetching Muntra patient data:', error);
+      debugInfo.errors.push({
+        message: 'Error fetching Muntra patient data',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
 
     return NextResponse.json({
       success: true,
-      patient: patientInfo
+      patient: patientInfo,
+      debug: debugInfo  // Include debug info in response
     })
     
   } catch (error) {
