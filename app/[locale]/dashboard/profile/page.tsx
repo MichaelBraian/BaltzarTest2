@@ -93,52 +93,136 @@ export default async function PatientProfilePage({ params }: Props) {
   let appointments: any[] = [];
   
   try {
+    // Try to get patient data from Muntra
     // Try to get patient info directly from Muntra service
     // First verify if the patient exists in Muntra
     const userEmail = user.email
     
     if (userEmail) {
       try {
-        const verificationResult = await muntraService.verifyPatient(userEmail)
-        
-        if (verificationResult.exists && verificationResult.patient) {
-          // Use the patient data from the verification result
-          patientInfo = {
-            ...patientInfo,
-            ...verificationResult.patient,
-          }
-          
-          // Get appointments if not included in verification result
-          if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
-            try {
-              const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
-              if (patientAppointments && patientAppointments.length > 0) {
-                patientInfo.appointments = patientAppointments
-              }
-            } catch (err) {
-              console.error('Failed to fetch appointments:', err)
+        // First try using the API endpoint which has the enhanced appointment fetching
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+        const response = await fetch(`${siteUrl}/api/patients/profile`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          next: { revalidate: 0 } // Don't cache this request
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success && data.patient) {
+            console.log('Successfully fetched patient data from API endpoint')
+            
+            // Update patient info with data from API
+            patientInfo = {
+              ...patientInfo,
+              ...data.patient
+            }
+            
+            // Extract appointments
+            if (data.patient.appointments && data.patient.appointments.length > 0) {
+              appointments = [...data.patient.appointments]
+              console.log(`Loaded ${appointments.length} appointments from API endpoint`)
             }
           }
+        } else {
+          console.warn('API endpoint failed, falling back to direct Muntra service')
+        }
+        
+        // If no appointments were loaded from the API, try direct method
+        if (!appointments || appointments.length === 0) {
+          console.log('No appointments from API, trying appointments endpoint');
           
-          // Sort appointments by date
-          if (patientInfo.appointments && patientInfo.appointments.length > 0) {
-            appointments = [...patientInfo.appointments].sort((a, b) => {
+          // Try the dedicated appointments endpoint
+          try {
+            const appointmentsResponse = await fetch(`${siteUrl}/api/patients/appointments`, {
+              headers: {
+                'Authorization': `Bearer ${session.access_token}`
+              },
+              next: { revalidate: 0 } // Don't cache this request
+            });
+            
+            if (appointmentsResponse.ok) {
+              const appointmentsData = await appointmentsResponse.json();
+              if (appointmentsData.success && appointmentsData.appointments && appointmentsData.appointments.length > 0) {
+                console.log(`Loaded ${appointmentsData.appointments.length} appointments from dedicated endpoint`);
+                appointments = [...appointmentsData.appointments];
+              } else {
+                console.log('No appointments from dedicated endpoint, trying direct Muntra service call');
+              }
+            } else {
+              console.log('Appointments endpoint failed with status:', appointmentsResponse.status);
+            }
+          } catch (appointmentsErr) {
+            console.error('Error fetching from appointments endpoint:', appointmentsErr);
+          }
+          
+          // If still no appointments, try the Muntra service directly
+          if (!appointments || appointments.length === 0) {
+            console.log('Trying direct Muntra service call for appointments');
+            const verificationResult = await muntraService.verifyPatient(userEmail)
+            
+            if (verificationResult.exists && verificationResult.patient) {
+              // Use the patient data from the verification result
+              patientInfo = {
+                ...patientInfo,
+                ...verificationResult.patient,
+              }
+              
+              // Get appointments if not included in verification result
+              if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
+                try {
+                  console.log('Fetching appointments directly from Muntra service')
+                  const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
+                  console.log(`Fetched ${patientAppointments.length} appointments directly from Muntra`)
+                  
+                  if (patientAppointments && patientAppointments.length > 0) {
+                    appointments = patientAppointments
+                  }
+                } catch (err) {
+                  console.error('Failed to fetch appointments:', err)
+                }
+              } else if (patientInfo.appointments && patientInfo.appointments.length > 0) {
+                appointments = [...patientInfo.appointments]
+                console.log(`Using ${appointments.length} appointments from verification result`)
+              }
+            } else {
+              // No Muntra record, falling back to mock data
+              patientInfo = {
+                ...patientInfo,
+                lastVisit: '2023-01-15',
+                nextAppointment: '2023-08-20 at 14:30',
+                dentist: 'Dr. Sara Lindberg',
+                clinic: 'Baltzar Tandvård',
+                status: 'Regular Patient',
+                insurance: 'Folktandvården Insurance'
+              }
+            }
+          }
+        }
+        
+        // Sort appointments by date
+        if (appointments && appointments.length > 0) {
+          console.log('Sorting appointments...')
+          appointments = [...appointments].sort((a, b) => {
+            try {
               const dateA = new Date(`${a.date} ${a.time}`)
               const dateB = new Date(`${b.date} ${b.time}`)
               return dateA.getTime() - dateB.getTime()
-            })
+            } catch (e) {
+              console.error('Error sorting appointments:', e)
+              return 0
+            }
+          })
+          console.log(`Sorted ${appointments.length} appointments`)
+          
+          // Debug log the first appointment
+          if (appointments.length > 0) {
+            console.log('First appointment:', JSON.stringify(appointments[0]))
           }
         } else {
-          // No Muntra record, falling back to mock data
-          patientInfo = {
-            ...patientInfo,
-            lastVisit: '2023-01-15',
-            nextAppointment: '2023-08-20 at 14:30',
-            dentist: 'Dr. Sara Lindberg',
-            clinic: 'Baltzar Tandvård',
-            status: 'Regular Patient',
-            insurance: 'Folktandvården Insurance'
-          }
+          console.log('No appointments to sort')
         }
       } catch (error) {
         console.error('Error accessing Muntra service:', error)
