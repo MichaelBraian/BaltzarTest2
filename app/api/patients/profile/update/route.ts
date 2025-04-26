@@ -56,6 +56,10 @@ export async function POST(request: Request) {
       lastName: requestData.fullName?.split(' ').slice(1).join(' ') || '',
       phoneNumberCell: requestData.phone || '',
       email: userEmail,
+      address: requestData.address || '',
+      postalCode: requestData.postalCode || '',
+      city: requestData.city || '',
+      country: requestData.country || '',
       // Map other fields as needed
     }
 
@@ -69,6 +73,10 @@ export async function POST(request: Request) {
           name: requestData.fullName,
           phone: requestData.phone,
           email: userEmail,
+          address: requestData.address,
+          postalCode: requestData.postalCode,
+          city: requestData.city,
+          country: requestData.country,
           preferredLanguage: requestData.preferredLanguage,
           emailNotifications: requestData.emailNotifications,
           smsNotifications: requestData.smsNotifications,

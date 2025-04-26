@@ -3,7 +3,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, User, Bell, Settings, Shield, Calendar } from 'lucide-react'
+import { ArrowLeft, User, Bell, Settings, Shield, Calendar, ArrowRight } from 'lucide-react'
 import { muntraService } from '@/lib/api/services/muntraService'
 
 export const metadata: Metadata = {
@@ -40,6 +40,10 @@ export default async function PatientProfilePage({ params }: Props) {
     email: locale === 'sv' ? 'E-post' : 'Email',
     name: locale === 'sv' ? 'Namn' : 'Name',
     phone: locale === 'sv' ? 'Telefon' : 'Phone',
+    address: locale === 'sv' ? 'Adress' : 'Address',
+    postalCode: locale === 'sv' ? 'Postnummer' : 'Postal Code',
+    city: locale === 'sv' ? 'Stad' : 'City',
+    country: locale === 'sv' ? 'Land' : 'Country',
     dentalInfo: locale === 'sv' ? 'Tandvårdsinformation' : 'Dental Care Information',
     nextAppointment: locale === 'sv' ? 'Nästa besök' : 'Next Appointment',
     noUpcomingAppointments: locale === 'sv' ? 'Inga kommande besök' : 'No upcoming appointments',
@@ -61,6 +65,13 @@ export default async function PatientProfilePage({ params }: Props) {
       : 'Failed to load patient data. Please try again later.',
     refreshButton: locale === 'sv' ? 'Uppdatera sidan' : 'Refresh Page',
     tryAgain: locale === 'sv' ? 'Försök igen' : 'Try Again',
+    appointmentDate: locale === 'sv' ? 'Datum' : 'Date',
+    appointmentTime: locale === 'sv' ? 'Tid' : 'Time',
+    appointmentClinic: locale === 'sv' ? 'Klinik' : 'Clinic',
+    appointmentClinician: locale === 'sv' ? 'Tandläkare' : 'Clinician',
+    appointmentType: locale === 'sv' ? 'Typ' : 'Type',
+    appointmentStatus: locale === 'sv' ? 'Status' : 'Status',
+    allAppointments: locale === 'sv' ? 'Alla besök' : 'All Appointments',
   }
   
   // Always provide basic profile data first from metadata
@@ -70,11 +81,16 @@ export default async function PatientProfilePage({ params }: Props) {
     name: userData.full_name || user.email?.split('@')[0] || '',
     email: user.email || '',
     phone: userData.phone || '-',
+    address: userData.address || '-',
+    postalCode: userData.postal_code || '-',
+    city: userData.city || '-',
+    country: userData.country || '-',
     // Add other fields from user metadata as needed
   }
   
   let hasError = false
   let errorMessage = '';
+  let appointments: any[] = [];
   
   try {
     // Try to get patient info directly from Muntra service
@@ -85,17 +101,32 @@ export default async function PatientProfilePage({ params }: Props) {
       try {
         const verificationResult = await muntraService.verifyPatient(userEmail)
         
-        if (verificationResult.exists && verificationResult.patientId) {
-          // Get patient details
-          const patientData = await muntraService.getPatientDetails(verificationResult.patientId)
-          
-          // Merge with basic data
+        if (verificationResult.exists && verificationResult.patient) {
+          // Use the patient data from the verification result
           patientInfo = {
             ...patientInfo,
-            ...patientData,
-            // Map any additional fields from Muntra
-            name: `${patientData.firstName} ${patientData.lastName}`,
-            phone: patientData.phoneNumberCell || patientData.phoneNumberWork || patientData.phoneNumberHome || patientInfo.phone,
+            ...verificationResult.patient,
+          }
+          
+          // Get appointments if not included in verification result
+          if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
+            try {
+              const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
+              if (patientAppointments && patientAppointments.length > 0) {
+                patientInfo.appointments = patientAppointments
+              }
+            } catch (err) {
+              console.error('Failed to fetch appointments:', err)
+            }
+          }
+          
+          // Sort appointments by date
+          if (patientInfo.appointments && patientInfo.appointments.length > 0) {
+            appointments = [...patientInfo.appointments].sort((a, b) => {
+              const dateA = new Date(`${a.date} ${a.time}`)
+              const dateB = new Date(`${b.date} ${b.time}`)
+              return dateA.getTime() - dateB.getTime()
+            })
           }
         } else {
           // No Muntra record, falling back to mock data
@@ -197,6 +228,32 @@ export default async function PatientProfilePage({ params }: Props) {
               </label>
               <p className="mt-1 text-white">{patientInfo.phone || '-'}</p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400">
+                {translations.address}
+              </label>
+              <p className="mt-1 text-white">{patientInfo.address || '-'}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400">
+                  {translations.postalCode}
+                </label>
+                <p className="mt-1 text-white">{patientInfo.postalCode || '-'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400">
+                  {translations.city}
+                </label>
+                <p className="mt-1 text-white">{patientInfo.city || '-'}</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400">
+                {translations.country}
+              </label>
+              <p className="mt-1 text-white">{patientInfo.country || '-'}</p>
+            </div>
           </div>
         </div>
 
@@ -208,30 +265,114 @@ export default async function PatientProfilePage({ params }: Props) {
               {translations.upcomingAppointments}
             </h2>
           </div>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400">
-                {translations.nextAppointment}
-              </label>
-              <p className="mt-1 text-white">
-                {patientInfo.nextAppointment || translations.noUpcomingAppointments}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400">
-                {translations.lastVisit}
-              </label>
-              <p className="mt-1 text-white">
-                {patientInfo.lastVisit || translations.noPreviousVisits}
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-700">
-              <div className="text-yellow-500 text-sm flex items-center">
-                <span className="mr-2">{translations.scheduleAppointment}:</span>
-                <span className="text-xs">{translations.comingSoon}</span>
+          
+          {appointments && appointments.length > 0 ? (
+            <div className="space-y-4">
+              {/* Next upcoming appointment */}
+              {appointments.find(a => new Date(`${a.date} ${a.time}`) > new Date()) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400">
+                    {translations.nextAppointment}
+                  </label>
+                  {(() => {
+                    const next = appointments.find(a => new Date(`${a.date} ${a.time}`) > new Date());
+                    return next ? (
+                      <div className="mt-2 p-3 bg-gray-700 rounded-md">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-300">{translations.appointmentDate}:</span>
+                          <span className="text-sm text-white">{next.date}</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-300">{translations.appointmentTime}:</span>
+                          <span className="text-sm text-white">{next.time}</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-300">{translations.appointmentClinic}:</span>
+                          <span className="text-sm text-white">{next.clinicName}</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-300">{translations.appointmentClinician}:</span>
+                          <span className="text-sm text-white">{next.clinicianName}</span>
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )}
+              
+              {/* Last visit */}
+              {appointments.find(a => new Date(`${a.date} ${a.time}`) < new Date()) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400">
+                    {translations.lastVisit}
+                  </label>
+                  {(() => {
+                    // Find the most recent past appointment
+                    const past = [...appointments]
+                      .filter(a => new Date(`${a.date} ${a.time}`) < new Date())
+                      .sort((a, b) => {
+                        const dateA = new Date(`${a.date} ${a.time}`);
+                        const dateB = new Date(`${b.date} ${b.time}`);
+                        return dateB.getTime() - dateA.getTime(); // Sort in descending order
+                      })[0];
+                      
+                    return past ? (
+                      <div className="mt-2 p-3 bg-gray-700 rounded-md">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-300">{translations.appointmentDate}:</span>
+                          <span className="text-sm text-white">{past.date}</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-300">{translations.appointmentTime}:</span>
+                          <span className="text-sm text-white">{past.time}</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-300">{translations.appointmentClinic}:</span>
+                          <span className="text-sm text-white">{past.clinicName}</span>
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )}
+              
+              {/* Link to all appointments */}
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <Link 
+                  href={`/${locale}/dashboard/appointments`} 
+                  className="text-orange-500 hover:text-orange-400 text-sm flex items-center"
+                >
+                  <span>{translations.allAppointments}</span>
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400">
+                  {translations.nextAppointment}
+                </label>
+                <p className="mt-1 text-white">
+                  {patientInfo.nextAppointment || translations.noUpcomingAppointments}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400">
+                  {translations.lastVisit}
+                </label>
+                <p className="mt-1 text-white">
+                  {patientInfo.lastVisit || translations.noPreviousVisits}
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <div className="text-yellow-500 text-sm flex items-center">
+                  <span className="mr-2">{translations.scheduleAppointment}:</span>
+                  <span className="text-xs">{translations.comingSoon}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Preferences & Notifications Card */}

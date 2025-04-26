@@ -17,6 +17,10 @@ interface ProfileEditFormProps {
 type ValidationErrors = {
   fullName?: string;
   phone?: string;
+  address?: string;
+  postalCode?: string;
+  city?: string;
+  country?: string;
 }
 
 export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEditFormProps) {
@@ -27,6 +31,10 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
   const [formData, setFormData] = useState({
     fullName: user.user_metadata?.full_name || patientInfo.name || '',
     phone: user.phone || patientInfo.phone || '',
+    address: user.user_metadata?.address || patientInfo.address || '',
+    postalCode: user.user_metadata?.postal_code || patientInfo.postalCode || '',
+    city: user.user_metadata?.city || patientInfo.city || '',
+    country: user.user_metadata?.country || patientInfo.country || '',
     preferredLanguage: locale || 'sv',
     emailNotifications: true,
     smsNotifications: false,
@@ -46,6 +54,10 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
     phone: locale === 'sv' ? 'Telefonnummer' : 'Phone Number',
     email: locale === 'sv' ? 'E-post' : 'Email',
     emailReadOnly: locale === 'sv' ? 'E-post kan inte ändras' : 'Email cannot be changed',
+    address: locale === 'sv' ? 'Adress' : 'Address',
+    postalCode: locale === 'sv' ? 'Postnummer' : 'Postal Code',
+    city: locale === 'sv' ? 'Stad' : 'City',
+    country: locale === 'sv' ? 'Land' : 'Country',
     preferredLanguage: locale === 'sv' ? 'Föredraget språk' : 'Preferred Language',
     swedish: 'Svenska',
     english: 'English',
@@ -70,6 +82,7 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
     redirecting: locale === 'sv'
       ? 'Omdirigerar...'
       : 'Redirecting...',
+    addressLabel: locale === 'sv' ? 'Adressinformation' : 'Address Information',
   }
   
   const validateForm = (): boolean => {
@@ -83,6 +96,20 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
     // Validate phone number (basic validation)
     if (formData.phone && !/^[+\d\s()-]{6,20}$/.test(formData.phone)) {
       errors.phone = t.phoneInvalid
+    }
+    
+    // Validate address
+    if (!formData.address.trim()) {
+      errors.address = 'Address is required'
+    }
+    if (!formData.postalCode.trim()) {
+      errors.postalCode = 'Postal code is required'
+    }
+    if (!formData.city.trim()) {
+      errors.city = 'City is required'
+    }
+    if (!formData.country.trim()) {
+      errors.country = 'Country is required'
     }
     
     setValidationErrors(errors)
@@ -137,6 +164,10 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
         data: {
           full_name: formData.fullName,
           phone: formData.phone,
+          address: formData.address,
+          postal_code: formData.postalCode,
+          city: formData.city,
+          country: formData.country,
           preferred_language: formData.preferredLanguage,
           email_notifications: formData.emailNotifications,
           sms_notifications: formData.smsNotifications,
@@ -154,6 +185,10 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
         body: JSON.stringify({
           fullName: formData.fullName,
           phone: formData.phone,
+          address: formData.address,
+          postalCode: formData.postalCode,
+          city: formData.city,
+          country: formData.country,
           preferredLanguage: formData.preferredLanguage,
           emailNotifications: formData.emailNotifications,
           smsNotifications: formData.smsNotifications,
@@ -285,6 +320,73 @@ export default function ProfileEditForm({ user, patientInfo, locale }: ProfileEd
                 className="w-full px-3 py-2 bg-gray-600 border border-gray-600 rounded-md text-gray-400 cursor-not-allowed"
               />
               <p className="mt-1 text-xs text-gray-500">{t.emailReadOnly}</p>
+            </div>
+            
+            {/* Address section */}
+            <div className="border-t border-gray-700 pt-6 mt-6">
+              <h3 className="text-md font-medium text-gray-300 mb-4">{t.addressLabel}</h3>
+              
+              {/* Street Address */}
+              <div className="mb-4">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-1">
+                  {t.address}
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Postal Code */}
+                <div>
+                  <label htmlFor="postalCode" className="block text-sm font-medium text-gray-300 mb-1">
+                    {t.postalCode}
+                  </label>
+                  <input
+                    type="text"
+                    id="postalCode"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+                
+                {/* City */}
+                <div>
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-1">
+                    {t.city}
+                  </label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+              </div>
+              
+              {/* Country */}
+              <div className="mt-4">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-300 mb-1">
+                  {t.country}
+                </label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
+                />
+              </div>
             </div>
             
             {/* Preferred Language */}
