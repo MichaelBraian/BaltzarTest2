@@ -53,10 +53,18 @@ export class PatientService {
     try {
       // First try to get details from Muntra
       const muntraPatient = await muntraService.getPatientDetails(patientId)
+      
+      // Check if muntraPatient is null before accessing its properties
+      if (!muntraPatient) {
+        throw new Error('Patient details not found in Muntra');
+      }
+      
       // Add required fields that Muntra API doesn't provide
       return {
         ...muntraPatient,
-        phone: muntraPatient.phoneNumberCell || muntraPatient.phoneNumberHome || muntraPatient.phoneNumberWork,
+        phone: muntraPatient.phone || '',
+        firstName: muntraPatient.firstName || muntraPatient.name.split(' ')[0] || '',
+        lastName: muntraPatient.lastName || muntraPatient.name.split(' ').slice(1).join(' ') || '',
         createdAt: new Date().toISOString(), // Use current time as fallback
         updatedAt: new Date().toISOString(), // Use current time as fallback
       } as Patient
@@ -80,10 +88,18 @@ export class PatientService {
     try {
       // First try to update in Muntra
       const muntraPatient = await muntraService.updatePatientProfile(patientId, data)
+      
+      // Check if muntraPatient is null before accessing its properties
+      if (!muntraPatient) {
+        throw new Error('Patient update failed in Muntra');
+      }
+      
       // Add required fields that Muntra API doesn't provide
       return {
         ...muntraPatient,
-        phone: muntraPatient.phoneNumberCell || muntraPatient.phoneNumberHome || muntraPatient.phoneNumberWork,
+        phone: muntraPatient.phone || '',
+        firstName: muntraPatient.firstName || muntraPatient.name.split(' ')[0] || '',
+        lastName: muntraPatient.lastName || muntraPatient.name.split(' ').slice(1).join(' ') || '',
         createdAt: new Date().toISOString(), // Use current time as fallback
         updatedAt: new Date().toISOString(), // Use current time as fallback
       } as Patient
