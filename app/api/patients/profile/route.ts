@@ -61,25 +61,27 @@ export async function GET(request: Request) {
 
     // Try to get patient data from Muntra
     try {
+      // First try to get patient data and appointments in one request
       const verificationResult = await muntraService.verifyPatient(userEmail)
       
       if (verificationResult.exists && verificationResult.patient) {
+        const muntraPatient = verificationResult.patient;
+        
         // Merge the Muntra data with the Supabase data
         // Prefer Muntra data for medical information but keep user preferences from Supabase
         patientInfo = {
           ...patientInfo,
-          name: verificationResult.patient.name || patientInfo.name,
-          phone: verificationResult.patient.phone || patientInfo.phone,
-          address: verificationResult.patient.address || patientInfo.address,
-          postalCode: verificationResult.patient.postalCode || patientInfo.postalCode,
-          city: verificationResult.patient.city || patientInfo.city,
-          country: verificationResult.patient.country || patientInfo.country,
-          appointments: verificationResult.patient.appointments || [],
+          name: muntraPatient.name || patientInfo.name,
+          phone: muntraPatient.phone || patientInfo.phone,
+          address: muntraPatient.address || patientInfo.address,
+          postalCode: muntraPatient.postalCode || patientInfo.postalCode,
+          city: muntraPatient.city || patientInfo.city,
+          country: muntraPatient.country || patientInfo.country,
         }
         
-        // If no appointments in verification result, try to fetch them separately
-        if (!patientInfo.appointments || patientInfo.appointments.length === 0) {
-          const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId || '')
+        // Handle appointments - always fetch them separately to ensure fresh data
+        if (verificationResult.patientId) {
+          const patientAppointments = await muntraService.getPatientAppointments(verificationResult.patientId)
           if (patientAppointments && patientAppointments.length > 0) {
             patientInfo.appointments = patientAppointments
           }

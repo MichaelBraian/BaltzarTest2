@@ -35,6 +35,8 @@ export interface MuntraAppointment {
   clinicianName: string
   status: AppointmentStatus
   type: string
+  notes?: string
+  location?: string
 }
 
 export interface MuntraVerificationResponse {
@@ -92,22 +94,39 @@ export class MuntraService {
           id: patient.id,
           email: patient.attributes.e_mail_address,
           name: patient.attributes.first_name + ' ' + patient.attributes.last_name,
+          firstName: patient.attributes.first_name,
+          lastName: patient.attributes.last_name,
           phone: patient.attributes.phone_number_cell || patient.attributes.phone_number_work || patient.attributes.phone_number_home || '',
-          address: patient.attributes.address,
-          postalCode: patient.attributes.postal_code,
-          city: patient.attributes.city,
-          country: patient.attributes.country,
+          address: patient.attributes.address_1 || patient.attributes.address || '',
+          postalCode: patient.attributes.postal_code || '',
+          city: patient.attributes.city || '',
+          country: patient.attributes.country || '',
           insuranceInformation: patient.attributes.insurance_information || 'Folktandvården Insurance',
-          appointments: patient.attributes.appointments?.map((appt: any) => ({
-            id: appt.id,
-            date: appt.attributes?.date || '',
-            time: appt.attributes?.time || '',
-            duration: appt.attributes?.duration || 30,
-            clinicName: appt.attributes?.clinic?.name || '',
-            clinicianName: appt.attributes?.clinician?.name || '',
-            status: appt.attributes?.status || 'scheduled',
-            type: appt.attributes?.type || 'consultation'
-          }))
+        }
+        
+        // Fetch appointments separately - they're not typically included in the patient search results
+        try {
+          const appointmentsResponse = await fetch(`${this.baseUrl}/api/patients/${patient.id}/appointments`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+          });
+          
+          if (appointmentsResponse.ok) {
+            const appointmentsData = await appointmentsResponse.json();
+            muntraPatient.appointments = (appointmentsData.data || []).map((appt: any) => ({
+              id: appt.id,
+              date: appt.attributes?.date || '',
+              time: appt.attributes?.time || '',
+              duration: appt.attributes?.duration || 30,
+              clinicName: appt.attributes?.clinic?.name || '',
+              clinicianName: appt.attributes?.clinician?.name || '',
+              status: appt.attributes?.status || 'scheduled',
+              type: appt.attributes?.type || 'consultation'
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch patient appointments:', err);
+          // Continue even if appointments fetch fails - non-critical
         }
         
         return {
@@ -278,19 +297,22 @@ export class MuntraService {
       const data = await response.json()
       
       // Map response to our appointment interface
-      return (data.data || []).map((appt: any) => ({
-        id: appt.id,
-        patientId: appt.patient_id || patientId,
-        providerId: appt.provider_id,
-        providerName: appt.provider_name,
-        appointmentType: appt.appointment_type,
-        date: appt.date,
-        time: appt.time,
-        duration: appt.duration,
-        status: appt.status,
-        notes: appt.notes,
-        location: appt.location
-      }))
+      return (data.data || []).map((appt: any) => {
+        const attributes = appt.attributes || {}
+        return {
+          id: appt.id,
+          date: attributes.date || '',
+          time: attributes.time || '',
+          duration: attributes.duration || 30,
+          clinicName: attributes.clinic?.name || attributes.clinic_name || '',
+          clinicianName: attributes.clinician?.name || attributes.clinician_name || '',
+          status: attributes.status || 'scheduled',
+          type: attributes.type || attributes.appointment_type || 'consultation',
+          // Add additional fields if they exist in the API response
+          notes: attributes.notes || '',
+          location: attributes.location || ''
+        }
+      })
     } catch (error) {
       console.error('Error fetching patient appointments:', error)
       // Return empty array instead of throwing to make this non-critical
