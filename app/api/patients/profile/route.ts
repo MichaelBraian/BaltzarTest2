@@ -106,6 +106,10 @@ export async function GET(request: Request) {
       // Verify patient exists and get basic info
       const verificationResult = await muntraService.verifyPatient(userEmail)
       
+      // Log verification result
+      console.log('=== DEBUG: Verification Result ===');
+      console.log(JSON.stringify(verificationResult, null, 2));
+      
       debugInfo.verificationResult = {
         exists: verificationResult.exists,
         patientId: verificationResult.patientId,
@@ -114,6 +118,10 @@ export async function GET(request: Request) {
       
       if (verificationResult.exists && verificationResult.patient) {
         const muntraPatient = verificationResult.patient;
+        
+        // Log raw patient data
+        console.log('=== DEBUG: Raw Muntra Patient Data ===');
+        console.log(JSON.stringify(muntraPatient, null, 2));
         
         debugInfo.muntraPatientData = {
           name: muntraPatient.name,
@@ -135,6 +143,10 @@ export async function GET(request: Request) {
           city: muntraPatient.city || patientInfo.city || '',
           country: muntraPatient.country || patientInfo.country || '',
         }
+        
+        // Log merged data
+        console.log('=== DEBUG: Merged Patient Data ===');
+        console.log(JSON.stringify(patientInfo, null, 2));
         
         debugInfo.mergedData = {
           finalAddress: patientInfo.address,

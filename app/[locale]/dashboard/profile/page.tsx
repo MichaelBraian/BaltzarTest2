@@ -159,11 +159,13 @@ export default async function PatientProfilePage({ params }: Props) {
           const data = await response.json()
           if (data.success && data.patient) {
             console.log('Successfully fetched patient data from API endpoint')
+            console.log('Debug info:', data.debug)
             
             // Update patient info with data from API
             patientInfo = {
               ...patientInfo,
-              ...data.patient
+              ...data.patient,
+              debug: data.debug
             }
             
             // Extract appointments
@@ -173,7 +175,7 @@ export default async function PatientProfilePage({ params }: Props) {
             }
           }
         } else {
-          console.warn('API endpoint failed, falling back to direct Muntra service')
+          console.warn('API endpoint failed:', await response.text())
         }
         
         // If no appointments were loaded from the API, try direct method
@@ -569,8 +571,12 @@ export default async function PatientProfilePage({ params }: Props) {
         </div>
       </div>
 
-      {/* Add debug panel */}
-      {'debug' in patientInfo && <DebugPanel debug={patientInfo.debug} />}
+      {/* Add debug panel at the bottom */}
+      {patientInfo.debug && (
+        <div className="mt-8">
+          <DebugPanel debug={patientInfo.debug} />
+        </div>
+      )}
     </div>
   )
 } 
