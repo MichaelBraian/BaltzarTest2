@@ -158,24 +158,36 @@ export default async function PatientProfilePage({ params }: Props) {
         if (response.ok) {
           const data = await response.json()
           if (data.success && data.patient) {
-            console.log('Successfully fetched patient data from API endpoint')
-            console.log('Debug info:', data.debug)
+            // Add visible debug section at the top level
+            const debugInfo = {
+              apiResponse: data,
+              patientData: data.patient,
+              debug: data.debug
+            };
+            
+            // Log to browser console
+            console.log('=== CLIENT DEBUG INFO ===');
+            console.log('API Response:', debugInfo);
             
             // Update patient info with data from API
             patientInfo = {
               ...patientInfo,
               ...data.patient,
-              debug: data.debug
+              _debug: debugInfo // Store debug info
             }
             
             // Extract appointments
             if (data.patient.appointments && data.patient.appointments.length > 0) {
               appointments = [...data.patient.appointments]
-              console.log(`Loaded ${appointments.length} appointments from API endpoint`)
             }
           }
         } else {
-          console.warn('API endpoint failed:', await response.text())
+          const errorText = await response.text();
+          console.error('API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText
+          });
         }
         
         // If no appointments were loaded from the API, try direct method
@@ -571,10 +583,24 @@ export default async function PatientProfilePage({ params }: Props) {
         </div>
       </div>
 
-      {/* Add debug panel at the bottom */}
-      {patientInfo.debug && (
-        <div className="mt-8">
-          <DebugPanel debug={patientInfo.debug} />
+      {/* Debug section - always visible in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-orange-500/30">
+          <h3 className="text-orange-500 font-bold mb-4">Debug Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-white font-semibold mb-2">Raw Patient Data</h4>
+              <pre className="text-xs text-green-400 bg-black/30 p-2 rounded overflow-auto max-h-60">
+                {JSON.stringify(patientInfo, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-2">Debug Data</h4>
+              <pre className="text-xs text-green-400 bg-black/30 p-2 rounded overflow-auto max-h-60">
+                {JSON.stringify(patientInfo._debug, null, 2)}
+              </pre>
+            </div>
+          </div>
         </div>
       )}
     </div>
