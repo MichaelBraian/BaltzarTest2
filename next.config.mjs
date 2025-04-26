@@ -6,8 +6,10 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', process.env.NEXT_PUBLIC_SITE_URL, '*.netlify.app'],
-      bodySizeLimit: '2mb'
+      allowedOrigins: [
+        'localhost:3000',
+        'baltzartandvardcursor.netlify.app'
+      ]
     }
   },
   env: {
