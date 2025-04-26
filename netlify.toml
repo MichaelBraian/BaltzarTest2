@@ -3,29 +3,24 @@
   publish = ".next"
 
 [build.environment]
-  # Environment variables that don't contain sensitive data
-  NEXT_PUBLIC_SITE_URL = "https://baltzartandvardcursor.netlify.app"
-  
-  # Note: Supabase credentials should be set via Netlify UI environment variables
-  # DO NOT hardcode sensitive credentials here - they should be set in Netlify UI
+  NEXT_TELEMETRY_DISABLED = "1"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
-
-[functions]
-  node_bundler = "esbuild"
-
+# Netlify Deployment
 [build.processing]
   skip_processing = false
+
+# Netlify Environment Variables Configuration
+[template.environment]
+  MUNTRA_API_KEY = "Muntra API key"
+  MUNTRA_API_BASE_URL = "Muntra API base URL (https://api.muntra.com)"
+  MUNTRA_CLIENT_ID = "Muntra Client ID"
+  NEXT_PUBLIC_SITE_URL = "Your site's public URL"
+
+# Fallback for SPAs (Single-Page Applications)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [build.processing.css]
   bundle = true
@@ -41,18 +36,20 @@
 [build.processing.images]
   compress = true
 
-# Make sure auth callback pages are handled correctly
-[[redirects]]
-  from = "/auth/callback"
-  to = "/auth/callback"
-  status = 200
-  force = true
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
-# Catch-all SPA route
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
+
+[functions]
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/static/*"
