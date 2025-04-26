@@ -1,7 +1,7 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { muntraService } from '@/lib/api/services/muntraService'
+import { muntraService, MuntraPatient, MuntraVerificationResponse } from '@/lib/api/services/muntraService'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,24 +63,69 @@ export async function GET(request: Request) {
 
     // Try to get patient data from Muntra
     try {
-      console.log('Fetching patient data from Muntra for email:', userEmail);
-      
-      // Verify patient exists and get basic info
-      const verificationResult = await muntraService.verifyPatient(userEmail)
-      
-      // Store raw verification result
-      let debugInfo = {
-        verificationResult: null,
+      // Try to get patient data from Muntra
+      interface DebugInfo {
+        verificationResult: {
+          exists: boolean;
+          patientId?: string;
+          hasPatient: boolean;
+          rawPatient?: MuntraPatient;
+        };
+        muntraPatientData: {
+          name: string;
+          email: string;
+          phone: string;
+          address?: string;
+          postalCode?: string;
+          city?: string;
+          country?: string;
+          rawData: MuntraPatient;
+        } | null;
+        mergedData: {
+          finalAddress: string;
+          finalPostalCode: string;
+          finalCity: string;
+          finalCountry: string;
+          muntraAddress?: string;
+          muntraPostalCode?: string;
+          supabaseAddress: string;
+          supabasePostalCode: string;
+          rawMuntraPatient: MuntraPatient;
+          rawSupabaseData: any;
+        } | null;
+        rawResponses: {
+          verification: MuntraVerificationResponse | null;
+          patientDetails: any | null;
+        };
+        errors: Array<{
+          message: string;
+          error: string;
+          stack?: string;
+        }>;
+      }
+
+      const debugInfo: DebugInfo = {
+        verificationResult: {
+          exists: false,
+          hasPatient: false,
+          rawPatient: undefined
+        },
         muntraPatientData: null,
         mergedData: null,
-        errors: [],
         rawResponses: {
           verification: null,
           patientDetails: null
-        }
+        },
+        errors: []
       };
 
       try {
+        console.log('Fetching patient data from Muntra for email:', userEmail);
+        
+        // Verify patient exists and get basic info
+        const verificationResult = await muntraService.verifyPatient(userEmail)
+        
+        // Store raw verification result
         debugInfo.rawResponses.verification = verificationResult;
         
         debugInfo.verificationResult = {
