@@ -64,90 +64,15 @@ export async function GET(request: Request) {
     // Try to get patient data from Muntra
     try {
       // Try to get patient data from Muntra
-      interface DebugInfo {
-        verificationResult: {
-          exists: boolean;
-          patientId?: string;
-          hasPatient: boolean;
-          rawPatient?: MuntraPatient;
-        };
-        muntraPatientData: {
-          name: string;
-          email: string;
-          phone: string;
-          address?: string;
-          postalCode?: string;
-          city?: string;
-          country?: string;
-          rawData: MuntraPatient;
-        } | null;
-        mergedData: {
-          finalAddress: string;
-          finalPostalCode: string;
-          finalCity: string;
-          finalCountry: string;
-          muntraAddress?: string;
-          muntraPostalCode?: string;
-          supabaseAddress: string;
-          supabasePostalCode: string;
-          rawMuntraPatient: MuntraPatient;
-          rawSupabaseData: any;
-        } | null;
-        rawResponses: {
-          verification: MuntraVerificationResponse | null;
-          patientDetails: any | null;
-        };
-        errors: Array<{
-          message: string;
-          error: string;
-          stack?: string;
-        }>;
-      }
-
-      const debugInfo: DebugInfo = {
-        verificationResult: {
-          exists: false,
-          hasPatient: false,
-          rawPatient: undefined
-        },
-        muntraPatientData: null,
-        mergedData: null,
-        rawResponses: {
-          verification: null,
-          patientDetails: null
-        },
-        errors: []
-      };
-
+      let dataSource = 'supabase';
+      
       try {
-        console.log('Fetching patient data from Muntra for email:', userEmail);
-        
-        // Verify patient exists and get basic info
+        // Try to get patient data from Muntra
         const verificationResult = await muntraService.verifyPatient(userEmail)
         
-        // Store raw verification result
-        debugInfo.rawResponses.verification = verificationResult;
-        
-        debugInfo.verificationResult = {
-          exists: verificationResult.exists,
-          patientId: verificationResult.patientId,
-          hasPatient: !!verificationResult.patient,
-          rawPatient: verificationResult.patient
-        };
-        
         if (verificationResult.exists && verificationResult.patient) {
+          dataSource = 'muntra';
           const muntraPatient = verificationResult.patient;
-          
-          debugInfo.muntraPatientData = {
-            name: muntraPatient.name,
-            email: muntraPatient.email,
-            phone: muntraPatient.phone,
-            address: muntraPatient.address,
-            postalCode: muntraPatient.postalCode,
-            city: muntraPatient.city,
-            country: muntraPatient.country,
-            rawData: muntraPatient
-          };
           
           // Update patient info with Muntra data, preferring Muntra data over Supabase
           patientInfo = {
@@ -160,7 +85,7 @@ export async function GET(request: Request) {
             city: muntraPatient.city || patientInfo.city,
             country: muntraPatient.country || patientInfo.country,
           }
-          
+
           // Log the data we're using
           console.log('Patient data sources:', {
             muntra: {
@@ -195,18 +120,13 @@ export async function GET(request: Request) {
         }
       } catch (error) {
         console.error('Error fetching Muntra patient data:', error);
-        debugInfo.errors.push({
-          message: 'Error fetching Muntra patient data',
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined
-        });
+        // Continue with Supabase data on error
       }
 
       return NextResponse.json({
         success: true,
         patient: patientInfo,
-        debug: debugInfo,
-        source: verificationResult.exists ? 'muntra' : 'supabase',
+        source: dataSource,
         _timestamp: new Date().toISOString()
       })
     } catch (error) {
